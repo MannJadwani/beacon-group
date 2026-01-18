@@ -9,106 +9,76 @@ export function TestimonialsSection() {
   const testimonials = useMemo(() => [...bricknetTestimonials], []);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const goPrev = () =>
-    setActiveIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
-  const goNext = () => setActiveIndex((i) => (i + 1) % testimonials.length);
+  const hasTestimonials = testimonials.length > 0;
+  const safeIndex = hasTestimonials ? activeIndex % testimonials.length : 0;
+  const active = testimonials[safeIndex];
 
-  const active = testimonials[activeIndex];
+  const goPrev = () => {
+    if (!hasTestimonials) return;
+    setActiveIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
+  };
+
+  const goNext = () => {
+    if (!hasTestimonials) return;
+    setActiveIndex((i) => (i + 1) % testimonials.length);
+  };
 
   if (!active) return null;
 
   return (
-    <section className="bg-base-white" aria-label="Testimonials">
-      <div className="wrapper px-5 py-10 lg:p-20">
-        <div className="flex flex-col gap-20">
-          <div className="flex flex-col gap-10">
-            <span className="label label-solid-orange">Testimonials</span>
-
-            <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-              <div className="flex flex-1 flex-col gap-6">
-                <h2 data-aos="fade" className="text-4xl font-medium leading-tight text-secondary-navy">
-                  What Our Clients Say
-                </h2>
-                <p className="text-lg leading-relaxed text-base-grey">
-                  Hear from those who&apos;ve built with us and see how we brought
-                  their visions to life.
-                </p>
-              </div>
-
-              <nav className="flex gap-6" aria-label="Testimonial navigation">
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  className="inline-flex items-center justify-center border border-secondary-navy px-6 py-3.5 text-secondary-navy transition-colors hover:border-primary-orange hover:bg-primary-orange hover:text-base-white"
-                  aria-label="Previous testimonial"
-                >
-                  <span aria-hidden="true" className="text-xl">
-                    ←
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={goNext}
-                  className="inline-flex items-center justify-center border border-secondary-navy px-6 py-3.5 text-secondary-navy transition-colors hover:border-primary-orange hover:bg-primary-orange hover:text-base-white"
-                  aria-label="Next testimonial"
-                >
-                  <span aria-hidden="true" className="text-xl">
-                    →
-                  </span>
-                </button>
-              </nav>
-            </div>
+    <section className="bg-primary-navy py-24 text-white lg:py-32" aria-label="Testimonials">
+      <div className="wrapper px-5 lg:px-20">
+        <div className="mb-20 grid grid-cols-1 items-end gap-8 lg:grid-cols-2 lg:mb-24">
+          <div data-aos="fade-right" className="space-y-6">
+            <span className="inline-block bg-accent-gold px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+              Trusted Partnerships
+            </span>
+            <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl">
+              What our partners say
+            </h2>
           </div>
+          <div className="flex items-center gap-4 lg:ml-auto">
+            <button
+              onClick={goPrev}
+              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
+            >
+              ←
+            </button>
+            <button
+              onClick={goNext}
+              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
+            >
+              →
+            </button>
+          </div>
+        </div>
 
-          <div>
-            <blockquote data-aos="fade-up" className="flex flex-col gap-10 bg-primary-light-orange p-10">
-              <Image
-                src="/bricknet/images/icon-quote.svg"
-                alt=""
-                width={60}
-                height={46}
-                aria-hidden="true"
-              />
-
-              <div className="flex flex-1 flex-col gap-4">
-                <p className="text-xl font-medium leading-normal text-secondary-navy">
+        <div className="relative min-h-[400px]">
+          <div key={safeIndex} data-aos="fade-up" className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-8">
+              <div className="space-y-10">
+                <Image
+                  src="https://beacontrustee.co.in/assets/images/media/media-quote.png"
+                  alt=""
+                  width={80}
+                  height={60}
+                  className="opacity-20 grayscale brightness-0 invert"
+                />
+                <p className="font-serif text-3xl italic leading-relaxed text-white lg:text-5xl">
                   {active.quote}
                 </p>
-                <p className="mt-auto text-base leading-relaxed text-base-grey">
-                  {active.body}
-                </p>
+                <div className="space-y-2">
+                  <p className="text-xl font-bold tracking-tight text-white">{active.name}</p>
+                  <p className="text-sm font-black uppercase tracking-widest text-accent-gold">{active.role}</p>
+                </div>
               </div>
-
-              <footer className="text-xl">
-                <cite className="not-italic">
-                  <span className="font-semibold text-secondary-navy">
-                    {active.name},
-                  </span>{" "}
-                  <span className="text-base-grey">{active.role}</span>
-                </cite>
-              </footer>
-            </blockquote>
-
-            <div
-              className="mt-8 flex justify-center gap-3"
-              aria-label="Testimonial pagination"
-            >
-              {testimonials.map((t, idx) => {
-                const isActive = idx === activeIndex;
-                return (
-                  <button
-                    key={t.name + t.role}
-                    type="button"
-                    onClick={() => setActiveIndex(idx)}
-                    className={
-                      "h-3 w-3 rounded-full transition-opacity " +
-                      (isActive ? "bg-primary-orange" : "bg-secondary-navy/30")
-                    }
-                    aria-label={`Go to testimonial ${idx + 1}`}
-                    aria-current={isActive}
-                  />
-                );
-              })}
+            </div>
+            <div className="hidden items-center justify-center lg:col-span-4 lg:flex">
+              <div className="relative h-64 w-64 overflow-hidden rounded-full border border-accent-gold/20 p-4">
+                 <div className="flex h-full w-full items-center justify-center rounded-full bg-accent-gold/5 text-6xl font-serif italic text-accent-gold/20">
+                    {active.name.charAt(0)}
+                 </div>
+              </div>
             </div>
           </div>
         </div>

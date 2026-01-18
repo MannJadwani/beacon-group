@@ -12,44 +12,48 @@ export function HeroSection() {
     >
       <div className="absolute inset-0 -z-20">
         <Image
-          src="/bricknet/images/hero-01@1x.webp"
-          alt="Modern city skyline with architectural structures"
+          src="https://beacontrustee.co.in/assets/images/banners/head-banner-1.jpg"
+          alt="Beacon Trusteeship leadership banner"
           fill
           priority
           className="object-cover"
           sizes="100vw"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-[#222222]/40" aria-hidden="true" />
+      <div className="absolute inset-0 -z-10 bg-[var(--color-primary-navy)]/60" aria-hidden="true" />
 
-      <BricknetHeader />
+      <BricknetHeader variant="overlay" />
 
-      <div className="wrapper mt-[80px] px-5 pb-20 pt-20 lg:mt-[118px] lg:px-20">
-        <div className="flex flex-col items-center gap-10 overflow-hidden">
-          <p className="inline-flex items-center gap-2 rounded-full border border-base-white/60 px-4 py-1.5 text-sm font-medium text-base-white">
-            <span className="block size-2 rounded-full bg-base-white" aria-hidden="true" />
-            Your Best-Construction Partner
-          </p>
+      <div className="wrapper relative z-10 mt-[80px] px-5 pb-20 pt-20 lg:mt-[118px] lg:px-20">
+        <div className="flex flex-col items-center gap-10 overflow-hidden text-center">
+          <div data-aos="fade-up" className="space-y-6">
+            <div className="flex justify-center">
+              <p className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-[0.2em] uppercase text-white/90">
+                <span className="block size-1.5 animate-pulse rounded-full bg-[var(--color-accent-gold)]" aria-hidden="true" />
+                First & Only Listed Trustee in India
+              </p>
+            </div>
 
-          <div className="flex w-full max-w-7xl flex-col items-center gap-6 text-center text-base-white">
             <h1
-              data-aos="fade"
-              className="text-4xl font-medium leading-tight lg:text-[80px] lg:leading-[88px]"
+              className="mx-auto max-w-5xl text-5xl font-medium leading-[1.1] tracking-tight text-white lg:text-8xl"
             >
-              Building Your Vision from the Ground Up
+              Paving a smooth road for <span className="text-[var(--color-accent-gold)]">debt fund raising</span>
             </h1>
-            <p data-aos="fade" data-aos-delay={300} className="max-w-[750px] text-lg leading-relaxed">
-              We offer reliable construction services with a focus on unmatched
-              quality, ensuring projects are completed on time and within budget.
+            
+            <p className="mx-auto max-w-2xl text-lg leading-relaxed text-white/70 lg:text-xl">
+              Beacon Trusteeship Limited delivers institutional-grade trustee, security, 
+              and escrow solutions that safeguard stakeholders and keep transactions moving.
             </p>
           </div>
 
-          <Link href="/contact" className="btn btn-solid-white" aria-label="Get a Free Quote">
-            Get a Free Quote
-            <span aria-hidden="true" className="text-xl">
-              →
-            </span>
-          </Link>
+          <div data-aos="fade-up" data-aos-delay={400} className="flex flex-col gap-4 sm:flex-row">
+            <Link href="/contact" className="group relative overflow-hidden rounded-full bg-white px-10 py-5 text-sm font-bold tracking-widest text-primary-navy transition-all hover:bg-accent-gold hover:text-white">
+              GET STARTED
+            </Link>
+            <Link href="/#services" className="glass group relative overflow-hidden rounded-full px-10 py-5 text-sm font-bold tracking-widest text-white transition-all hover:bg-white/10">
+              OUR SERVICES
+            </Link>
+          </div>
         </div>
       </div>
     </section>

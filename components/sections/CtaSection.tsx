@@ -2,28 +2,26 @@ import Link from "next/link";
 
 export function CtaSection() {
   return (
-    <section className="bg-secondary-light-navy" aria-label="Call to action">
-      <div className="wrapper flex flex-col items-center justify-center gap-16 px-5 py-20 lg:p-20">
-        <h2
-          data-aos="fade"
-          className="max-w-[980px] border-b border-base-white pb-16 text-center text-4xl font-medium leading-tight text-base-white lg:text-[80px]"
-          id="cta-title"
-        >
-          Ready to Build Something Remarkable?
-        </h2>
+    <section className="bg-accent-gold py-24 lg:py-40" aria-label="Call to action">
+      <div className="wrapper px-5 lg:px-20 text-center">
+        <div data-aos="fade-up" className="space-y-12">
+          <h2
+            className="mx-auto max-w-5xl font-serif text-5xl font-medium leading-[1.1] text-white lg:text-[100px]"
+            id="cta-title"
+          >
+            Ready to partner with a <br /> <span className="italic opacity-60 underline decoration-white/20">trusted</span> trustee?
+          </h2>
 
-        <Link
-          data-aos="fade-up"
-          data-aos-delay={150}
-          href="/projects"
-          className="btn btn-solid-white"
-          aria-label="View More Project"
-        >
-          View More Project
-          <span aria-hidden="true" className="text-xl">
-            →
-          </span>
-        </Link>
+          <div className="pt-8">
+            <Link
+              href="/contact"
+              className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-12 py-6 text-sm font-bold tracking-[0.2em] text-primary-navy transition-all hover:bg-primary-navy hover:text-white"
+              aria-label="Contact Beacon Trusteeship"
+            >
+              <span className="relative z-10">SCHEDULE A CONVERSATION</span>
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );

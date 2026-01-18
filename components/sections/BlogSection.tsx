@@ -6,102 +6,77 @@ export function BlogSection() {
   const [featured, ...rest] = bricknetBlogPosts;
 
   return (
-    <section id="blog" className="bg-base-white" aria-label="Blog">
-      <div className="wrapper px-5 py-20 pt-10 lg:px-20 lg:pb-28 lg:pt-20">
-        <div className="flex flex-col items-center gap-20">
-          <div className="flex flex-col items-center gap-10">
-            <span className="label label-solid-orange">Blog</span>
-            <div className="flex flex-col items-center gap-6">
-              <h2 data-aos="fade" className="text-center text-4xl font-medium leading-tight text-base-black">
-                Insights & Updates
-              </h2>
-              <p className="text-center text-lg leading-relaxed text-base-grey">
-                Explore trends, tips, and inspiration in construction
-              </p>
-            </div>
-          </div>
+    <section id="research" className="bg-white py-24 lg:py-32" aria-label="Research">
+      <div className="wrapper px-5 lg:px-20">
+        <div className="mb-20 space-y-6 lg:mb-24">
+          <span className="inline-block bg-primary-navy px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+            Library
+          </span>
+          <h2 className="text-4xl font-medium leading-[1.1] text-primary-navy lg:text-6xl">
+            Research & <br /> Regulatory Updates
+          </h2>
+        </div>
 
-          <ul
-            className="flex w-full list-none flex-col gap-20 p-0 lg:flex-row"
-            aria-label="Blog articles"
-          >
-            {featured ? (
-              <li className="flex flex-1 flex-col gap-8">
-                <article data-aos="fade-up" className="flex w-full flex-col gap-6 pb-8">
-                  {featured.imageSrc ? (
-                    <a href="#" className="w-full transition-opacity hover:opacity-75">
-                      <div className="relative aspect-[35/28] w-full lg:aspect-[15/7]">
-                        <Image
-                          src={featured.imageSrc}
-                          alt={featured.imageAlt ?? ""}
-                          fill
-                          className="object-cover"
-                          sizes="(min-width: 1024px) 50vw, 100vw"
-                        />
-                      </div>
-                    </a>
-                  ) : null}
-
-                  <div className="flex w-full items-center justify-between">
-                    <span className="label label-outline-dark">{featured.category}</span>
-                    <time className="pl-5 text-lg leading-relaxed text-base-grey">
-                      {featured.date}
-                    </time>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24">
+          {featured ? (
+            <div data-aos="fade-right">
+              <article className="group space-y-8">
+                {featured.imageSrc && (
+                  <div className="relative aspect-video overflow-hidden">
+                    <Image
+                      src={featured.imageSrc}
+                      alt={featured.imageAlt ?? ""}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-primary-navy/20 transition-opacity group-hover:opacity-0" />
                   </div>
-
-                  <a href="#" className="transition-opacity hover:opacity-75">
-                    <h3 className="text-xl font-medium leading-snug text-secondary-navy">
+                )}
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-accent-gold">
+                    <span>{featured.category}</span>
+                    <span className="h-px w-8 bg-accent-gold/30" />
+                    <time className="text-secondary-light-navy">{featured.date}</time>
+                  </div>
+                  <h3 className="font-serif text-3xl leading-tight text-primary-navy lg:text-4xl">
+                    <a href={featured.href} className="hover:text-accent-gold transition-colors">
                       {featured.title}
-                    </h3>
+                    </a>
+                  </h3>
+                  <a href={featured.href} className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary-navy transition-all group-hover:bg-primary-navy group-hover:text-white">
+                    ↓
                   </a>
+                </div>
+              </article>
+            </div>
+          ) : null}
 
-                  <div className="inline-flex items-center gap-3">
-                    <span className="text-lg font-medium leading-tight text-secondary-navy">
-                      {featured.author}
-                    </span>
-                    <span className="block size-3 rounded-full bg-primary-orange" aria-hidden="true" />
-                    <span className="text-lg leading-tight text-base-grey">
-                      {featured.readingTime}
-                    </span>
+          <div className="space-y-12">
+            {rest.map((post, idx) => (
+              <article
+                key={post.title}
+                className="group border-b border-primary-navy/10 pb-12 last:border-0"
+                data-aos="fade-up"
+                data-aos-delay={idx * 100}
+              >
+                <div className="space-y-4">
+                   <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-accent-gold">
+                    <span>{post.category}</span>
+                    <time className="text-secondary-light-navy">{post.date}</time>
                   </div>
-                </article>
-              </li>
-            ) : null}
-
-            <li className="flex flex-1 flex-col gap-8">
-              {rest.map((post, idx) => (
-                <article
-                  key={post.title}
-                  className="flex w-full flex-col gap-6 border-b border-base-grey-stroke pb-8"
-                  data-aos="fade-up"
-                  data-aos-delay={idx * 100}
-                >
-                  <div className="flex w-full items-center justify-between">
-                    <span className="label label-outline-dark">{post.category}</span>
-                    <time className="pl-5 text-lg leading-relaxed text-base-grey">
-                      {post.date}
-                    </time>
-                  </div>
-
-                  <a href="#" className="transition-opacity hover:opacity-75">
-                    <h3 className="text-xl font-medium leading-snug text-secondary-navy">
+                  <h3 className="font-serif text-2xl leading-tight text-primary-navy lg:text-3xl">
+                    <a href={post.href} className="hover:text-accent-gold transition-colors">
                       {post.title}
-                    </h3>
+                    </a>
+                  </h3>
+                  <a href={post.href} className="inline-flex text-xs font-bold tracking-widest text-primary-navy hover:text-accent-gold transition-colors">
+                    DOWNLOAD PDF →
                   </a>
-
-                  <div className="inline-flex items-center gap-3">
-                    <span className="text-lg font-medium leading-tight text-secondary-navy">
-                      {post.author}
-                    </span>
-                    <span className="block size-3 rounded-full bg-primary-orange" aria-hidden="true" />
-                    <span className="text-lg leading-tight text-base-grey">
-                      {post.readingTime}
-                    </span>
-                  </div>
-                </article>
-              ))}
-            </li>
-          </ul>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </section>

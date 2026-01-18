@@ -57,94 +57,56 @@ export function FeaturedProjectsSection() {
   };
 
   return (
-    <section id="projects" className="bg-secondary-navy" aria-label="Featured Projects">
-      <div className="wrapper px-5 py-20 lg:p-20">
-        <div className="flex flex-col gap-20">
-          <div className="flex flex-col items-center gap-6 text-center lg:flex-row lg:items-start lg:text-left">
-            <h2 data-aos="fade" className="flex-1 text-4xl font-medium leading-tight text-base-white">
-              Featured Projects
-            </h2>
-            <p data-aos="fade" data-aos-delay={200} className="flex-1 text-lg leading-relaxed text-base-white-background">
-              A closer look at our craftsmanship, showcasing quality in every
-              project.
-            </p>
-          </div>
+    <section id="media" className="bg-primary-navy py-24 text-white lg:py-32" aria-label="Beacon in Media">
+      <div className="wrapper px-5 lg:px-20">
+        <div className="mb-20 space-y-6 lg:mb-24">
+          <span className="inline-block bg-accent-gold px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+            Perspective
+          </span>
+          <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl">
+            Beacon in Media
+          </h2>
+        </div>
 
-          <div className="relative">
-            <div
-              ref={trackRef}
-              className="flex snap-x snap-mandatory gap-10 overflow-x-auto scroll-smooth pb-6"
-              aria-label="Project carousel"
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+          {projects.map((project, idx) => (
+            <article
+              key={project.title}
+              data-aos="fade-up"
+              data-aos-delay={idx * 100}
+              className="group space-y-6"
             >
-              {projects.map((project) => (
-                <div
-                  key={project.title}
-                  data-slide="true"
-                  className="w-full shrink-0 snap-start"
-                >
-                  <div className="flex flex-col gap-10 lg:flex-row lg:gap-0">
-                    <div className="relative aspect-[35/52] w-full lg:aspect-[15/8] lg:w-[71%]">
-                      <div className="absolute left-4 top-4 z-20 inline-flex items-center gap-3 rounded-full bg-base-white px-4 py-1.5 text-sm font-medium text-secondary-navy">
-                        <span
-                          className="block size-3 rounded-full bg-primary-orange"
-                          aria-hidden="true"
-                        />
-                        {project.category}
-                      </div>
-
-                      <Image
-                        src={project.imageSrc}
-                        alt={project.imageAlt}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 1024px) 70vw, 100vw"
-                      />
-
-                      <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 from-[17%] to-black/0" />
-                      <div className="absolute inset-0 z-20 flex items-end p-6 text-base leading-relaxed text-base-white [text-shadow:_0px_4px_4px_rgb(0_0_0_/_0.50)]">
-                        {project.description}
-                      </div>
-                    </div>
-
-                    <div className="flex w-full flex-col items-center lg:w-[26%] lg:items-start lg:pl-10">
-                      <div className="flex w-full flex-col items-center gap-10 text-center lg:items-start lg:text-left">
-                        <div>
-                          <h3 className="line-clamp-2 text-2xl font-medium leading-tight text-base-white">
-                            {project.title}
-                          </h3>
-                          <p className="mt-2 text-base text-base-grey-stroke">
-                            {project.year}
-                          </p>
-                          <p className="text-base text-base-grey-stroke">
-                            {project.client}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <div className="relative aspect-[4/5] overflow-hidden grayscale transition-all duration-700 group-hover:grayscale-0">
+                <Image
+                  src={project.imageSrc}
+                  alt={project.imageAlt}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-primary-navy/40 mix-blend-multiply transition-opacity group-hover:opacity-0" />
+                <div className="absolute bottom-0 left-0 p-8">
+                  <span className="inline-block bg-white px-3 py-1 text-[10px] font-black tracking-widest text-primary-navy">
+                    {project.year}
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            <div className="flex justify-center gap-3 lg:justify-start" aria-label="Carousel pagination">
-              {projects.map((p, idx) => {
-                const isActive = idx === activeIndex;
-                return (
-                  <button
-                    key={p.title}
-                    type="button"
-                    onClick={() => scrollToIndex(idx)}
-                    className={
-                      "h-3 w-3 rounded-full transition-opacity " +
-                      (isActive ? "bg-primary-orange" : "bg-base-white/40")
-                    }
-                    aria-label={`Go to ${p.title}`}
-                    aria-current={isActive}
-                  />
-                );
-              })}
-            </div>
-          </div>
+              </div>
+              
+              <div className="space-y-4">
+                <h3 className="font-serif text-2xl leading-tight text-white lg:text-3xl">
+                  {project.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-white/50">
+                  {project.description}
+                </p>
+                <a
+                  href="https://beacontrustee.co.in/press"
+                  className="inline-flex items-center gap-2 text-xs font-black tracking-widest text-accent-gold hover:text-white transition-colors"
+                >
+                  READ COVERAGE →
+                </a>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

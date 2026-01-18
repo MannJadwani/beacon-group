@@ -1,24 +1,26 @@
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
+import { ElectricHeader } from "@/components/layout/ElectricHeader";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { BlogSection } from "@/components/sections/BlogSection";
 import { CtaSection } from "@/components/sections/CtaSection";
 import { FeaturedProjectsSection } from "@/components/sections/FeaturedProjectsSection";
-import { HeroSection } from "@/components/sections/HeroSection";
+import { ElectricHero } from "@/components/sections/electric/ElectricHero";
 import { PartnersSection } from "@/components/sections/PartnersSection";
 import { PricingSection } from "@/components/sections/PricingSection";
-import { ServicesSection } from "@/components/sections/ServicesSection";
+import { ElectricServices } from "@/components/sections/electric/ElectricServices";
 import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
-import { ValuesSection } from "@/components/sections/ValuesSection";
+import { ElectricValues } from "@/components/sections/electric/ElectricValues";
 import { WorkProcessSection } from "@/components/sections/WorkProcessSection";
 
-export default function Home() {
+export default function ElectricThemePage() {
   return (
-    <main id="main-content">
-      <HeroSection />
+    <main id="main-content" className="theme-electric bg-white">
+      <ElectricHeader />
+      <ElectricHero />
       <PartnersSection />
       <AboutSection />
-      <ServicesSection />
-      <ValuesSection />
+      <ElectricServices />
+      <ElectricValues />
       <TestimonialsSection />
       <FeaturedProjectsSection />
       <WorkProcessSection />

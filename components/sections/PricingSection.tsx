@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { bricknetPricingPlans } from "@/lib/constants/bricknet";
 
 export function PricingSection() {
@@ -6,13 +8,13 @@ export function PricingSection() {
       <div className="wrapper px-5 py-10 lg:p-20">
         <div className="flex flex-col items-center gap-20">
           <div className="flex flex-col items-center gap-10">
-            <span className="label label-solid-orange">Pricing</span>
+            <span className="label label-solid-orange">Service Coverage</span>
             <div className="flex flex-col items-center gap-6 px-5">
               <h2 data-aos="fade" className="text-center text-4xl font-medium leading-tight text-secondary-navy">
-                Transparent Pricing for Every Project
+                Regulated and specialized trustee solutions
               </h2>
               <p className="text-center text-lg leading-relaxed text-base-grey">
-                Choose a plan that fits your budget and scope
+                Explore core trustee mandates, regulated offerings, and specialized services.
               </p>
             </div>
           </div>
@@ -44,12 +46,12 @@ export function PricingSection() {
                   </div>
                 </div>
 
-                <a
-                  href="#"
+                <Link
+                  href={plan.href}
                   className="w-full bg-primary-light-orange px-6 py-3.5 text-center text-base font-medium leading-tight text-secondary-navy transition-colors duration-300 hover:bg-base-white hover:text-primary-orange group-hover:bg-primary-orange group-hover:text-base-white"
                 >
                   {plan.cta}
-                </a>
+                </Link>
 
                 <div className="flex w-full flex-col gap-4">
                   <h4 className="text-lg font-medium leading-tight text-secondary-navy transition-colors group-hover:text-base-white">

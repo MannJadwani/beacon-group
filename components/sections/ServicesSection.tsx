@@ -4,57 +4,63 @@ import { bricknetServices } from "@/lib/constants/bricknet";
 
 export function ServicesSection() {
   return (
-    <section id="services" className="bg-base-white" aria-label="Our Services">
-      <div className="wrapper px-5 py-10 lg:px-20 lg:py-20">
-        <div className="flex flex-col items-center gap-20">
-          <div className="flex flex-col items-center gap-10">
-            <span className="label label-solid-orange">Our Services</span>
-            <div className="flex flex-col items-center gap-6">
-              <h2 data-aos="fade" className="text-center text-4xl font-medium leading-tight text-secondary-navy">
-                We Build Everything You Need
-              </h2>
-              <p className="max-w-[850px] text-center text-lg leading-relaxed text-base-grey">
-                We provide tailored construction solutions, designed to meet your
-                needs and executed with precision and expertise.
-              </p>
-            </div>
+    <section id="services" className="bg-primary-navy py-24 text-white lg:py-32" aria-label="Our Services">
+      <div className="wrapper px-5 lg:px-20">
+        <div className="mb-20 grid grid-cols-1 items-end gap-8 lg:grid-cols-2 lg:mb-24">
+          <div data-aos="fade-right" className="space-y-6">
+            <span className="inline-block bg-accent-gold px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+              Core Expertise
+            </span>
+            <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl">
+              Solutions across the capital markets lifecycle
+            </h2>
           </div>
+          <p data-aos="fade-left" className="text-lg leading-relaxed text-white/60 lg:max-w-md lg:ml-auto">
+            From debenture trusteeship to securitization and escrow, 
+            Beacon delivers institutional-grade oversight for global markets.
+          </p>
+        </div>
 
-          <ul
-            className="grid w-full list-none grid-cols-1 gap-10 p-0 lg:grid-cols-3 lg:gap-y-20"
-            aria-label="Service offerings"
-          >
-            {bricknetServices.map((service, idx) => (
-              <li
-                key={service.number}
-                className="flex w-full flex-col gap-8"
-                data-aos="fade-up"
-                data-aos-delay={idx * 100}
-              >
-                <div className="text-xl leading-tight text-primary-orange">
+        <div className="grid grid-cols-1 gap-px bg-white/10 lg:grid-cols-3">
+          {bricknetServices.map((service, idx) => (
+            <div
+              key={service.number}
+              className="group relative overflow-hidden bg-primary-navy p-10 transition-colors hover:bg-white/5 lg:p-12"
+              data-aos="fade-up"
+              data-aos-delay={idx * 100}
+            >
+              <div className="mb-12 flex items-center justify-between">
+                <span className="text-sm font-black tracking-widest text-accent-gold">
                   {service.number}
-                </div>
-                <div className="flex flex-col gap-6">
-                  <h3 className="text-2xl font-medium leading-tight text-base-black">
-                    {service.title}
-                  </h3>
-                  <p className="text-base leading-relaxed text-base-grey">
-                    {service.description}
-                  </p>
-                </div>
-                <div className="mt-auto">
-                  <Image
-                    src={service.imageSrc}
-                    alt={service.imageAlt}
-                    width={400}
-                    height={340}
-                    className="h-auto w-full max-h-[340px] object-cover"
-                    sizes="(min-width: 1024px) 360px, 100vw"
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
+                </span>
+                <span className="h-px w-12 bg-white/20 transition-all group-hover:w-20 group-hover:bg-accent-gold" />
+              </div>
+              
+              <div className="relative z-10 space-y-4">
+                <h3 className="text-2xl font-medium tracking-tight lg:text-3xl">
+                  {service.title}
+                </h3>
+                <p className="text-base leading-relaxed text-white/50">
+                  {service.description}
+                </p>
+              </div>
+
+              <div className="absolute inset-0 z-0 opacity-0 transition-opacity duration-700 group-hover:opacity-10">
+                <Image
+                  src={service.imageSrc}
+                  alt={service.imageAlt}
+                  fill
+                  className="object-cover grayscale"
+                />
+              </div>
+
+              <div className="mt-12 pt-12">
+                <button className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 transition-all group-hover:border-accent-gold group-hover:bg-accent-gold">
+                  →
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

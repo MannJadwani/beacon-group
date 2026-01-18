@@ -4,50 +4,59 @@ import { bricknetStats } from "@/lib/constants/bricknet";
 
 export function AboutSection() {
   return (
-    <section id="about" className="bg-base-white" aria-label="About Us">
-      <div className="wrapper px-5 py-10 lg:px-20 lg:py-20">
-        <div className="flex flex-col items-center gap-20 lg:items-start">
-          <div className="flex w-full flex-col items-center gap-10 lg:items-start">
-            <span className="label label-solid-orange">About Us</span>
-
-            <div className="flex w-full flex-col items-center gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-y-0">
-              <h2
-                data-aos="fade"
-                className="w-full max-w-[800px] text-center text-3xl font-medium leading-tight text-secondary-navy lg:text-left"
-              >
-                With decades of experience, we specialize in turning ideas into{" "}
-                <span className="text-primary-orange">well-designed structures</span>
-                {" "}that stand the test of time.
+    <section id="about" className="relative overflow-hidden bg-white py-24 lg:py-32" aria-label="About Us">
+      <div className="swiss-grid absolute inset-0 opacity-[0.03]" />
+      
+      <div className="wrapper relative z-10 px-5 lg:px-20">
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-24">
+          <div className="lg:col-span-8">
+            <div data-aos="fade-right" className="space-y-8">
+              <span className="inline-block bg-[var(--color-accent-gold)] px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+                Our Foundation
+              </span>
+              
+              <h2 className="text-4xl font-medium leading-[1.1] text-[var(--color-primary-navy)] lg:text-6xl">
+                Our people are what sets us apart. We blend customer-centric 
+                trustee services with <span className="text-[var(--color-accent-gold)]">integrity and expertise</span>.
               </h2>
+              
+              <p className="max-w-2xl text-xl leading-relaxed text-secondary-light-navy">
+                As India&apos;s first listed trustee company, we&apos;ve set the standard for 
+                regulatory rigor and proactive execution in capital markets.
+              </p>
 
-              <Link href="/about" className="btn btn-outline-dark" aria-label="Get to Know Us">
-                Get to Know Us
-                <span aria-hidden="true" className="text-xl">
-                  →
-                </span>
-              </Link>
+              <div className="pt-4">
+                <Link href="/who-we-are" className="group inline-flex items-center gap-4 text-sm font-bold tracking-widest text-primary-navy">
+                  <span className="relative">
+                    COMPANY OVERVIEW
+                    <span className="absolute -bottom-1 left-0 h-0.5 w-full scale-x-0 bg-accent-gold transition-transform group-hover:scale-x-100" />
+                  </span>
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-navy transition-colors group-hover:bg-primary-navy group-hover:text-white">
+                    →
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
 
-          <div
-            className="grid w-full grid-cols-1 gap-y-20 lg:grid-cols-4 lg:gap-y-0"
-            aria-label="Company statistics"
-          >
-            {bricknetStats.map((stat, idx) => (
-              <div
-                key={stat.label}
-                className="flex flex-col items-center gap-4 border-t border-base-grey-stroke pt-8"
-                data-aos="fade-up"
-                data-aos-delay={idx * 100}
-              >
-                <div className="text-center text-6xl font-medium leading-tight text-secondary-navy">
-                  {stat.value}
+          <div className="lg:col-span-4">
+            <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-1">
+              {bricknetStats.map((stat, idx) => (
+                <div
+                  key={stat.label}
+                  className="group relative border-l-2 border-[var(--color-accent-gold)]/20 pl-8 transition-colors hover:border-[var(--color-accent-gold)]"
+                  data-aos="fade-up"
+                  data-aos-delay={idx * 100}
+                >
+                  <div className="mb-1 text-5xl font-medium tracking-tight text-[var(--color-primary-navy)] lg:text-6xl">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm font-bold uppercase tracking-wider text-secondary-light-navy">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-center text-lg leading-tight text-base-grey">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

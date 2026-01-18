@@ -1,33 +1,105 @@
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-cormorant);
 
-  --color-base-black: #111;
-  --color-base-grey: #616161;
-  --color-base-grey-stroke: #c8c8c8;
   --color-base-white: #fff;
-  --color-base-white-background: #eee;
+  --color-base-white-background: #ffffff;
 
-  --color-primary-orange: #fb4d17;
-  --color-primary-light-orange: #ffe1d5;
-  --color-primary-tp-light-orange: #fff6f2;
+  --color-primary-navy: #0B1230;
+  --color-primary-navy-dark: #11183A;
+  --color-accent-gold: #D6B26E;
 
-  --color-secondary-navy: #222e3c;
-  --color-secondary-light-navy: #698996;
+  --color-secondary-navy: #0B1230;
+  --color-secondary-light-navy: #4a5568;
+
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 12px;
 }
 
 html,
 body {
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   background: var(--color-base-white);
-  color: var(--color-base-black);
+  color: var(--color-primary-navy);
+  @apply selection:bg-accent-gold selection:text-white;
 }
 
 @layer utilities {
+  .glass {
+    background: color-mix(in srgb, var(--color-primary-navy) 70%, transparent);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid color-mix(in srgb, var(--color-accent-gold) 20%, transparent);
+  }
+
+  .theme-bento {
+    --color-primary-navy: #00AFB9; /* Turquoise Blue */
+    --color-primary-navy-dark: #008B94;
+    --color-accent-gold: #FFD700; /* Bright Yellow */
+    --color-secondary-navy: #00AFB9;
+    --radius-md: 24px;
+    --radius-lg: 32px;
+  }
+
+  .theme-electric {
+    --color-primary-navy: #183EFA; /* Electric Blue */
+    --color-primary-navy-dark: #0F2AB0; /* Darker shade of Electric Blue */
+    --color-accent-gold: #EDE44C; /* Electric Yellow */
+    --color-secondary-navy: #183EFA;
+    --color-secondary-light-navy: #4B6BFB; /* Lighter shade for secondary elements */
+    
+    /* Adjusting glass effects for the lighter blue if needed, keeping defaults for now */
+  }
+
+  .bento-card {
+    background: #f8f9fa;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    border-radius: var(--radius-lg);
+    @apply transition-all duration-500 overflow-hidden;
+  }
+
+  .bento-card-blue {
+    background: var(--color-primary-navy);
+    color: white;
+    border-radius: var(--radius-lg);
+    @apply transition-all duration-500 overflow-hidden relative;
+  }
+
+  .bento-card-yellow {
+    background: var(--color-accent-gold);
+    color: #0B1230;
+    border-radius: var(--radius-lg);
+    @apply transition-all duration-500 overflow-hidden relative;
+  }
+
+  .bento-grid-dense {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(100px, auto);
+    gap: 1.5rem;
+  }
+
+  .glass-dark {
+    background: color-mix(in srgb, var(--color-primary-navy) 40%, transparent);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .swiss-grid {
+    background-image: linear-gradient(rgba(11, 18, 48, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11, 18, 48, 0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
   [data-aos].aos-init {
     opacity: 0;
     will-change: opacity, transform;
@@ -71,55 +143,21 @@ body {
     @apply mx-auto w-full max-w-7xl;
   }
 
-  .label {
-    @apply inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium leading-tight;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    @apply tracking-tight;
   }
 
-  .label-solid-orange {
-    @apply bg-primary-tp-light-orange text-secondary-navy;
+  .btn-gold {
+    @apply bg-accent-gold text-white hover:bg-primary-navy transition-all duration-300;
   }
 
-  .label-solid-dark-orange {
-    @apply bg-primary-orange text-base-white;
-  }
-
-  .label-outline-white {
-    @apply border border-base-white text-base-white;
-  }
-
-  .label-outline-dark {
-    @apply border border-secondary-navy text-secondary-navy;
-  }
-
-  .label-outline-orange {
-    @apply border border-primary-orange text-primary-orange;
-  }
-
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 text-center text-base font-medium leading-tight transition-colors duration-200;
-  }
-
-  .btn-cta {
-    @apply bg-primary-orange text-base-white hover:bg-base-white hover:text-secondary-navy;
-  }
-
-  .btn-outline-dark {
-    @apply border border-secondary-navy text-secondary-navy hover:bg-secondary-navy hover:text-base-white;
-  }
-
-  .btn-solid-white {
-    @apply bg-base-white text-secondary-navy hover:bg-primary-orange hover:text-base-white;
-  }
-
-  .btn-solid-orange {
-    @apply bg-primary-orange text-base-white hover:bg-base-white hover:text-secondary-navy;
-  }
-
-  .btn-solid-dark {
-    @apply bg-secondary-navy text-base-white hover:bg-primary-orange hover:text-base-white;
-  }
-
-  .btn-outline-white {
-    @apply border border-base-white text-base-white hover:bg-base-white hover:text-secondary-navy;
+  .btn-navy {
+    @apply bg-primary-navy text-white hover:bg-accent-gold transition-all duration-300;
   }
 }

@@ -1,19 +1,32 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Cormorant_Garamond, Manrope, Nunito } from "next/font/google";
 
 import { ScrollAos } from "@/components/ui/ScrollAos";
 
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const nunito = Nunito({
+  variable: "--font-nunito",
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Bricknet",
+  title: "Beacon Trusteeship",
   description:
-    "Bricknet - Building Your Vision from the Ground Up. Professional construction services with unmatched quality and expertise.",
+    "Beacon Trusteeship Limited - trustee, security, and escrow solutions for issuers, lenders, and investors.",
 };
 
 export default function RootLayout({
@@ -22,11 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-      <html lang="en" className="scroll-smooth">
-        <body className={`${inter.variable} font-sans antialiased`}>
-          <ScrollAos />
-          {children}
-        </body>
-      </html>
+    <html lang="en" className="scroll-smooth">
+      <body className={`${cormorant.variable} ${manrope.variable} ${nunito.variable} font-sans antialiased`}>
+        <ScrollAos />
+        {children}
+      </body>
+    </html>
   );
 }

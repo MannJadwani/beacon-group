@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 import { bricknetNavLinks, type NavLink as NavLinkType } from "@/lib/constants/bricknet";
 
-type BricknetHeaderVariant = "overlay" | "white";
+type VariantBlueHeaderVariant = "overlay" | "white";
 
 function NavItem({ 
   link, 
@@ -33,12 +33,10 @@ function NavItem({
         href={link.href}
         aria-current={isActive ? "page" : undefined}
         className={
-          "relative flex items-center gap-1 rounded-sm px-3 py-1.5 text-[14px] font-semibold tracking-tight transition-all " +
+          "relative flex items-center gap-1 rounded-xl px-4 py-2 text-[14px] font-semibold tracking-tight transition-all " +
           (isActive
-            ? "text-accent-gold"
-            : (dark && !isElevated)
-              ? "text-primary-navy/80 hover:text-primary-navy hover:bg-black/5"
-              : "text-white/80 hover:text-white hover:bg-white/10")
+            ? "text-[#183EFA] bg-[#183EFA]/5"
+            : "text-[#183EFA]/70 hover:text-[#183EFA] hover:bg-[#183EFA]/5")
         }
       >
         {link.label}
@@ -52,30 +50,23 @@ function NavItem({
       {link.children && (
         <div
           className={
-            "absolute left-0 top-full pt-1 w-56 origin-top transition-all duration-300 ease-out " +
+            "absolute left-0 top-full pt-2 w-56 origin-top transition-all duration-300 ease-out " +
             (isHovered
               ? "visible translate-y-0 opacity-100"
               : "invisible -translate-y-2 opacity-0")
           }
         >
-          <div className={
-            "border border-white/10 shadow-xl " +
-            ((dark && !isElevated)
-              ? "bg-white/95 backdrop-blur-xl border-black/5" 
-              : "glass-dark")
-          }>
-            <div className="flex flex-col p-1">
+          <div className="rounded-2xl bg-white/95 backdrop-blur-xl border border-[#183EFA]/5 shadow-xl shadow-[#183EFA]/10 overflow-hidden">
+            <div className="flex flex-col p-2">
               {link.children.map((child) => (
                 <Link
                   key={child.href}
                   href={child.href}
                   className={
-                    "block px-4 py-2 text-[13px] font-medium transition-colors " +
+                    "block px-4 py-3 rounded-xl text-[13px] font-medium transition-colors " +
                     (pathname === child.href
-                      ? "text-accent-gold bg-black/[0.03]"
-                      : (dark && !isElevated)
-                        ? "text-primary-navy/70 hover:text-primary-navy hover:bg-black/5"
-                        : "text-white/70 hover:text-white hover:bg-white/10")
+                      ? "text-[#183EFA] bg-[#183EFA]/5"
+                      : "text-[#183EFA]/60 hover:text-[#183EFA] hover:bg-[#183EFA]/5")
                   }
                 >
                   {child.label}
@@ -89,10 +80,10 @@ function NavItem({
   );
 }
 
-export function BricknetHeader({
+export function VariantBlueHeader({
   variant = "overlay",
 }: {
-  variant?: BricknetHeaderVariant;
+  variant?: VariantBlueHeaderVariant;
 }) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -120,10 +111,8 @@ export function BricknetHeader({
       className={
         "fixed inset-x-0 top-0 z-50 transition-all duration-300 " +
         (isElevated
-          ? "bg-[var(--color-primary-navy)] border-b border-white/10 py-3 shadow-2xl"
-          : variant === "white" 
-            ? "bg-white/40 backdrop-blur-xl border-b border-black/5 py-4"
-            : "bg-transparent py-5")
+          ? "bg-white/80 backdrop-blur-xl border-b border-[#183EFA]/5 py-3 shadow-lg shadow-[#183EFA]/5"
+          : "bg-transparent py-5")
       }
       aria-label="Site header"
     >
@@ -139,10 +128,8 @@ export function BricknetHeader({
               alt="Beacon Trusteeship Logo"
               fill
               priority
-              className={
-                "object-contain transition-all duration-300 " +
-                (variant === "white" && !isElevated ? "brightness-0" : "brightness-0 invert")
-              }
+              className="object-contain brightness-0 transition-all duration-300"
+              style={{ filter: "brightness(0) saturate(100%) invert(15%) sepia(89%) saturate(5765%) hue-rotate(232deg) brightness(98%) contrast(97%)" }}
             />
           </div>
         </Link>
@@ -151,7 +138,7 @@ export function BricknetHeader({
           className="hidden lg:block"
           aria-label="Primary navigation"
         >
-          <ul className="flex items-center gap-1">
+          <ul className="flex items-center gap-1 rounded-2xl bg-white/60 backdrop-blur-sm p-1.5 shadow-lg shadow-[#183EFA]/5">
             {bricknetNavLinks.map((link) => (
               <NavItem 
                 key={link.label} 
@@ -167,24 +154,14 @@ export function BricknetHeader({
         <div className="flex items-center gap-4 shrink-0">
           <Link
             href="/contact"
-            className={
-              "group relative hidden items-center justify-center overflow-hidden rounded-sm px-6 py-2.5 text-[12px] font-bold tracking-widest transition-all lg:flex " +
-              ((variant === "white" && !isElevated)
-                ? "bg-[var(--color-primary-navy)] text-white hover:bg-[var(--color-accent-gold)]"
-                : "bg-[var(--color-accent-gold)] text-white hover:bg-white hover:text-[var(--color-primary-navy)]")
-            }
+            className="group relative hidden items-center justify-center overflow-hidden rounded-xl px-6 py-2.5 text-[12px] font-bold tracking-widest transition-all lg:flex bg-[#183EFA] text-white shadow-lg shadow-[#183EFA]/25 hover:shadow-xl hover:shadow-[#183EFA]/30 hover:-translate-y-0.5"
           >
             <span className="relative z-10 uppercase">Investor Login</span>
           </Link>
 
           <button
             type="button"
-            className={
-              "flex h-10 w-10 items-center justify-center rounded-full transition-colors lg:hidden " +
-              ((variant === "white" && !isElevated)
-                ? "bg-black/5 text-primary-navy hover:bg-black/10"
-                : "bg-white/10 text-white hover:bg-white/20")
-            }
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-lg shadow-[#183EFA]/10 text-[#183EFA] transition-all hover:shadow-xl lg:hidden"
             aria-label={isMenuOpen ? "Close mobile menu" : "Open mobile menu"}
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((v) => !v)}
@@ -204,12 +181,12 @@ export function BricknetHeader({
         }
       >
         <div
-          className="absolute inset-0 bg-secondary-navy/95 backdrop-blur-xl"
+          className="absolute inset-0 bg-[#183EFA]/10 backdrop-blur-sm"
           onClick={() => setIsMenuOpen(false)}
         />
         <div
           className={
-            "absolute inset-y-0 right-0 w-full max-w-sm border-l border-white/10 bg-secondary-navy p-8 transition-transform duration-500 " +
+            "absolute inset-y-0 right-0 w-full max-w-sm bg-white/95 backdrop-blur-xl p-8 shadow-2xl transition-transform duration-500 " +
             (isMenuOpen ? "translate-x-0" : "translate-x-full")
           }
         >
@@ -219,35 +196,36 @@ export function BricknetHeader({
                 src={logoSrc}
                 alt="Beacon Logo"
                 fill
-                className="object-contain brightness-0 invert"
+                className="object-contain"
+                style={{ filter: "brightness(0) saturate(100%) invert(15%) sepia(89%) saturate(5765%) hue-rotate(232deg) brightness(98%) contrast(97%)" }}
               />
             </div>
             <button
               onClick={() => setIsMenuOpen(false)}
-              className="h-10 w-10 rounded-full border border-white/10 text-white"
+              className="h-11 w-11 rounded-xl bg-[#183EFA]/5 text-[#183EFA] shadow-lg"
             >
               ×
             </button>
           </div>
 
-          <nav className="space-y-4">
+          <nav className="space-y-3">
             {bricknetNavLinks.map((link) => (
-              <div key={link.label} className="space-y-4">
+              <div key={link.label} className="space-y-3">
                 <Link
                   href={link.href}
                   onClick={() => !link.children && setIsMenuOpen(false)}
-                  className="block text-2xl font-serif text-white hover:text-accent-gold transition-colors"
+                  className="block text-2xl font-medium text-[#183EFA] hover:text-[#183EFA]/70 transition-colors"
                 >
                   {link.label}
                 </Link>
                 {link.children && (
-                  <div className="pl-4 space-y-3 border-l border-white/10">
+                  <div className="pl-4 space-y-2 border-l-2 border-[#EDE44C]/30">
                     {link.children.map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className="block text-lg text-white/60 hover:text-accent-gold transition-colors"
+                        className="block text-lg text-[#183EFA]/60 hover:text-[#183EFA] transition-colors"
                       >
                         {child.label}
                       </Link>
@@ -258,10 +236,10 @@ export function BricknetHeader({
             ))}
           </nav>
 
-          <div className="mt-12 pt-12 border-t border-white/10">
+          <div className="mt-12 pt-12 border-t border-[#183EFA]/10">
             <Link
               href="/contact"
-              className="block w-full rounded-full bg-accent-gold py-4 text-center font-bold text-white uppercase tracking-widest text-sm"
+              className="block w-full rounded-2xl bg-[#183EFA] py-4 text-center font-bold text-white uppercase tracking-widest text-sm shadow-xl shadow-[#183EFA]/25"
             >
               INVESTOR LOGIN
             </Link>

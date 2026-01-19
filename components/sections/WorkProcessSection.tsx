@@ -21,25 +21,25 @@ export function WorkProcessSection() {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-px bg-primary-navy/10 border border-primary-navy/10">
               {bricknetWorkSteps.map((step, idx) => (
                 <article
                   key={step.number}
-                  className="group relative bg-white border border-primary-navy/5 p-10 transition-all hover:shadow-xl lg:p-12"
+                  className="group relative bg-white p-10 transition-all hover:bg-primary-navy hover:text-white lg:p-12"
                   data-aos="fade-up"
                   data-aos-delay={idx * 100}
                 >
                   <div className="mb-8 flex items-center justify-between">
-                    <span className="font-serif text-5xl italic text-accent-gold opacity-20 transition-opacity group-hover:opacity-100">
+                    <span className="text-5xl font-black text-accent-gold opacity-20 transition-opacity group-hover:opacity-100">
                       {step.number}
                     </span>
                     <div className="h-px w-20 bg-primary-navy/10 transition-all group-hover:w-32 group-hover:bg-accent-gold" />
                   </div>
                   <div className="space-y-4">
-                    <h3 className="text-2xl font-medium tracking-tight text-primary-navy lg:text-3xl">
+                    <h3 className="text-2xl font-medium tracking-tight text-primary-navy group-hover:text-white lg:text-3xl">
                       {step.title}
                     </h3>
-                    <p className="text-base leading-relaxed text-secondary-light-navy lg:text-lg">
+                    <p className="text-base leading-relaxed text-secondary-light-navy group-hover:text-white/80 lg:text-lg">
                       {step.description}
                     </p>
                   </div>

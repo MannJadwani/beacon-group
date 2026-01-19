@@ -31,7 +31,7 @@ export function AboutSection() {
                     COMPANY OVERVIEW
                     <span className="absolute -bottom-1 left-0 h-0.5 w-full scale-x-0 bg-accent-gold transition-transform group-hover:scale-x-100" />
                   </span>
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-navy transition-colors group-hover:bg-primary-navy group-hover:text-white">
+                  <span className="flex h-10 w-10 items-center justify-center border border-primary-navy transition-colors group-hover:bg-primary-navy group-hover:text-white">
                     →
                   </span>
                 </Link>

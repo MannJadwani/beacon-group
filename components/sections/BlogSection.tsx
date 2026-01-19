@@ -39,12 +39,12 @@ export function BlogSection() {
                     <span className="h-px w-8 bg-accent-gold/30" />
                     <time className="text-secondary-light-navy">{featured.date}</time>
                   </div>
-                  <h3 className="font-serif text-3xl leading-tight text-primary-navy lg:text-4xl">
+                  <h3 className="text-3xl font-medium leading-tight text-primary-navy lg:text-4xl">
                     <a href={featured.href} className="hover:text-accent-gold transition-colors">
                       {featured.title}
                     </a>
                   </h3>
-                  <a href={featured.href} className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary-navy transition-all group-hover:bg-primary-navy group-hover:text-white">
+                  <a href={featured.href} className="inline-flex h-12 w-12 items-center justify-center border border-primary-navy transition-all group-hover:bg-primary-navy group-hover:text-white">
                     ↓
                   </a>
                 </div>
@@ -52,25 +52,25 @@ export function BlogSection() {
             </div>
           ) : null}
 
-          <div className="space-y-12">
+          <div className="space-y-0 border-t border-primary-navy/10">
             {rest.map((post, idx) => (
               <article
                 key={post.title}
-                className="group border-b border-primary-navy/10 pb-12 last:border-0"
+                className="group border-b border-primary-navy/10 py-10 transition-colors hover:bg-primary-navy hover:text-white"
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
               >
-                <div className="space-y-4">
+                <div className="px-6 space-y-4">
                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-accent-gold">
                     <span>{post.category}</span>
-                    <time className="text-secondary-light-navy">{post.date}</time>
+                    <time className="text-secondary-light-navy group-hover:text-white/60">{post.date}</time>
                   </div>
-                  <h3 className="font-serif text-2xl leading-tight text-primary-navy lg:text-3xl">
+                  <h3 className="text-2xl font-medium leading-tight text-primary-navy lg:text-3xl group-hover:text-white">
                     <a href={post.href} className="hover:text-accent-gold transition-colors">
                       {post.title}
                     </a>
                   </h3>
-                  <a href={post.href} className="inline-flex text-xs font-bold tracking-widest text-primary-navy hover:text-accent-gold transition-colors">
+                  <a href={post.href} className="inline-flex text-xs font-bold tracking-widest text-primary-navy group-hover:text-white/80 hover:text-accent-gold transition-colors">
                     DOWNLOAD PDF →
                   </a>
                 </div>

@@ -8,11 +8,14 @@ export function ServicesSection() {
       <div className="wrapper px-5 lg:px-20">
         <div className="mb-20 grid grid-cols-1 items-end gap-8 lg:grid-cols-2 lg:mb-24">
           <div data-aos="fade-right" className="space-y-6">
-            <span className="inline-block bg-accent-gold px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
-              Core Expertise
-            </span>
-            <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl">
-              Solutions across the capital markets lifecycle
+            <div className="flex">
+              <p className="inline-flex items-center gap-2 bg-accent-gold px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                <span className="block size-1.5 bg-white" aria-hidden="true" />
+                Core Expertise
+              </p>
+            </div>
+            <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl text-white">
+              Solutions across the <br /> <span className="text-accent-gold">capital markets</span> lifecycle
             </h2>
           </div>
           <p data-aos="fade-left" className="text-lg leading-relaxed text-white/60 lg:max-w-md lg:ml-auto">
@@ -54,8 +57,8 @@ export function ServicesSection() {
                 />
               </div>
 
-              <div className="mt-12 pt-12">
-                <button className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 transition-all group-hover:border-accent-gold group-hover:bg-accent-gold">
+              <div className="mt-12">
+                <button className="flex h-12 w-12 items-center justify-center border border-white/20 transition-all group-hover:border-accent-gold group-hover:bg-accent-gold group-hover:text-white">
                   →
                 </button>
               </div>

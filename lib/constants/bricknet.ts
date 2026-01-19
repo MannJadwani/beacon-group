@@ -17,6 +17,7 @@ export const bricknetNavLinks: NavLink[] = [
       { label: "Bubbly Theme", href: "/bubbly-theme" },
       { label: "Who We Are (v2)", href: "/who-we-are-2" },
       { label: "Who We Are (v3)", href: "/who-we-are-3" },
+      { label: "Blue Variant", href: "/variant-blue" },
     ],
   },
   { label: "Services", href: "/#services" },

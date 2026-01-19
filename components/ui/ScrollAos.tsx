@@ -52,7 +52,9 @@ export function ScrollAos() {
         }
       },
       {
-        threshold: 0.12,
+        // Use a very low threshold so extremely tall sections still animate.
+        // (With higher thresholds, large elements may never reach the required intersection ratio.)
+        threshold: 0,
         rootMargin: "0px 0px -10% 0px",
       },
     );

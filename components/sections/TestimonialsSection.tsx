@@ -40,32 +40,25 @@ export function TestimonialsSection() {
           <div className="flex items-center gap-4 lg:ml-auto">
             <button
               onClick={goPrev}
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
+              className="group flex h-14 w-14 items-center justify-center border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
             >
               ←
             </button>
             <button
               onClick={goNext}
-              className="group flex h-14 w-14 items-center justify-center rounded-full border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
+              className="group flex h-14 w-14 items-center justify-center border border-white/20 transition-all hover:bg-accent-gold hover:text-white hover:border-accent-gold"
             >
               →
             </button>
           </div>
         </div>
 
-        <div className="relative min-h-[400px]">
+        <div className="relative border-t border-white/10 pt-20">
           <div key={safeIndex} data-aos="fade-up" className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-8">
               <div className="space-y-10">
-                <Image
-                  src="https://beacontrustee.co.in/assets/images/media/media-quote.png"
-                  alt=""
-                  width={80}
-                  height={60}
-                  className="opacity-20 grayscale brightness-0 invert"
-                />
-                <p className="font-serif text-3xl italic leading-relaxed text-white lg:text-5xl">
-                  {active.quote}
+                <p className="text-3xl font-medium leading-relaxed text-white lg:text-5xl">
+                  &ldquo;{active.quote}&rdquo;
                 </p>
                 <div className="space-y-2">
                   <p className="text-xl font-bold tracking-tight text-white">{active.name}</p>
@@ -74,8 +67,8 @@ export function TestimonialsSection() {
               </div>
             </div>
             <div className="hidden items-center justify-center lg:col-span-4 lg:flex">
-              <div className="relative h-64 w-64 overflow-hidden rounded-full border border-accent-gold/20 p-4">
-                 <div className="flex h-full w-full items-center justify-center rounded-full bg-accent-gold/5 text-6xl font-serif italic text-accent-gold/20">
+              <div className="relative h-64 w-64 border border-accent-gold/20 p-4">
+                 <div className="flex h-full w-full items-center justify-center bg-accent-gold/5 text-8xl font-black text-accent-gold/20">
                     {active.name.charAt(0)}
                  </div>
               </div>

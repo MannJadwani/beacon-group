@@ -30,18 +30,18 @@ export function ValuesSection() {
               {bricknetValues.map((value, idx) => (
                 <article
                   key={value.title}
-                  className="group relative flex flex-col space-y-6 bg-white border border-primary-navy/5 p-10 transition-all hover:shadow-2xl hover:border-accent-gold/20"
+                  className="group relative flex flex-col space-y-6 bg-white border border-primary-navy/10 p-10 transition-all hover:bg-primary-navy hover:text-white"
                   data-aos="fade-up"
                   data-aos-delay={idx * 100}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center bg-accent-gold/10 text-accent-gold transition-colors group-hover:bg-accent-gold group-hover:text-white">
+                  <div className="flex h-12 w-12 items-center justify-center bg-accent-gold text-white">
                     <span className="text-xl font-black">0{idx + 1}</span>
                   </div>
                   <div className="space-y-3">
-                    <h3 className="text-2xl font-medium tracking-tight text-primary-navy">
+                    <h3 className="text-2xl font-medium tracking-tight text-primary-navy group-hover:text-white">
                       {value.title}
                     </h3>
-                    <p className="text-base leading-relaxed text-secondary-light-navy">
+                    <p className="text-base leading-relaxed text-secondary-light-navy group-hover:text-white/80">
                       {value.description}
                     </p>
                   </div>

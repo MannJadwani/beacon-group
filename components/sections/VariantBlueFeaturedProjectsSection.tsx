@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { bricknetFeaturedProjects } from "@/lib/constants/bricknet";
 
-export function FeaturedProjectsSection() {
+export function VariantBlueFeaturedProjectsSection() {
   const projects = useMemo(() => [...bricknetFeaturedProjects], []);
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -57,18 +57,22 @@ export function FeaturedProjectsSection() {
   };
 
   return (
-    <section id="media" className="bg-primary-navy py-24 text-white lg:py-32" aria-label="Beacon in Media">
-      <div className="wrapper px-5 lg:px-20">
+    <section id="media" className="relative py-24 text-white lg:py-32 overflow-hidden bg-gradient-to-br from-[#183EFA] via-[#2952ff] to-[#183EFA]" aria-label="Beacon in Media">
+      {/* Soft decorative elements */}
+      <div className="absolute top-20 left-10 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
+      <div className="absolute bottom-20 right-10 h-96 w-96 rounded-full bg-[#EDE44C]/10 blur-3xl" />
+      
+      <div className="wrapper relative z-10 px-5 lg:px-20">
         <div className="mb-20 space-y-6 lg:mb-24">
-          <span className="inline-block bg-accent-gold px-3 py-1 text-[10px] font-black tracking-[0.3em] uppercase text-white">
+          <span className="inline-block bg-white/10 backdrop-blur-sm px-4 py-2 text-[10px] font-bold tracking-[0.3em] uppercase text-white rounded-full">
             Perspective
           </span>
-          <h2 className="text-4xl font-medium leading-[1.1] lg:text-6xl">
+          <h2 className="text-4xl font-semibold leading-[1.1] lg:text-6xl">
             Beacon in Media
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {projects.map((project, idx) => (
             <article
               key={project.title}
@@ -76,23 +80,23 @@ export function FeaturedProjectsSection() {
               data-aos-delay={idx * 100}
               className="group space-y-6"
             >
-              <div className="relative aspect-[4/5] grayscale transition-all duration-700 group-hover:grayscale-0">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl transition-all duration-500 group-hover:-translate-y-2">
                 <Image
                   src={project.imageSrc}
                   alt={project.imageAlt}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0"
                 />
-                <div className="absolute inset-0 bg-primary-navy/40 mix-blend-multiply transition-opacity group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#183EFA]/80 via-[#183EFA]/20 to-transparent transition-opacity group-hover:opacity-60" />
                 <div className="absolute bottom-0 left-0 p-8">
-                  <span className="inline-block bg-white px-3 py-1 text-[10px] font-black tracking-widest text-primary-navy">
+                  <span className="inline-block bg-white px-4 py-2 text-[10px] font-bold tracking-widest text-[#183EFA] rounded-full shadow-lg">
                     {project.year}
                   </span>
                 </div>
               </div>
               
-              <div className="space-y-4">
-                <h3 className="text-2xl font-medium leading-tight text-white lg:text-3xl">
+              <div className="space-y-4 px-2">
+                <h3 className="font-serif text-2xl leading-tight text-white lg:text-3xl">
                   {project.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-white/50">
@@ -100,7 +104,7 @@ export function FeaturedProjectsSection() {
                 </p>
                 <a
                   href="https://beacontrustee.co.in/press"
-                  className="inline-flex h-12 w-full items-center justify-center border border-white/20 text-xs font-black tracking-widest text-white hover:bg-white hover:text-primary-navy transition-all"
+                  className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-[#EDE44C] hover:text-white transition-colors"
                 >
                   READ COVERAGE →
                 </a>

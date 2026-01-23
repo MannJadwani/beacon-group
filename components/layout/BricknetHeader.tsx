@@ -174,7 +174,7 @@ export function BricknetHeader({
                 : "bg-[var(--color-accent-gold)] text-white hover:bg-white hover:text-[var(--color-primary-navy)]")
             }
           >
-            <span className="relative z-10 uppercase">Investor Login</span>
+            <span className="relative z-10 uppercase">Start Onboarding</span>
           </Link>
 
           <button
@@ -263,7 +263,7 @@ export function BricknetHeader({
               href="/contact"
               className="block w-full rounded-full bg-accent-gold py-4 text-center font-bold text-white uppercase tracking-widest text-sm"
             >
-              INVESTOR LOGIN
+              START ONBOARDING
             </Link>
           </div>
         </div>

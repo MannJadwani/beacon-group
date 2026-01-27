@@ -21,7 +21,8 @@ function NavItem({
   isElevated?: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  const isActive = pathname === link.href || link.children?.some(child => pathname === child.href);
+  const childLinks = link.children ?? link.childrenGroups?.flatMap((group) => group.links) ?? [];
+  const isActive = pathname === link.href || childLinks.some((child) => pathname === child.href);
 
   return (
     <li 
@@ -42,17 +43,19 @@ function NavItem({
         }
       >
         {link.label}
-        {link.children && (
+        {(link.children || link.childrenGroups) && (
           <span className={`text-[8px] transition-transform duration-300 ${isHovered ? "rotate-180" : ""}`}>
             ▼
           </span>
         )}
       </Link>
 
-      {link.children && (
+      {(link.children || link.childrenGroups) && (
         <div
           className={
-            "absolute left-0 top-full pt-1 w-56 origin-top transition-all duration-300 ease-out " +
+            (link.childrenGroups
+              ? "absolute left-1/2 -translate-x-1/2 top-full pt-1 origin-top transition-all duration-300 ease-out "
+              : "absolute left-0 top-full pt-1 origin-top transition-all duration-300 ease-out ") +
             (isHovered
               ? "visible translate-y-0 opacity-100"
               : "invisible -translate-y-2 opacity-0")
@@ -61,27 +64,64 @@ function NavItem({
           <div className={
             "border border-white/10 shadow-xl " +
             ((dark && !isElevated)
-              ? "bg-white/95 backdrop-blur-xl border-black/5" 
-              : "glass-dark")
+              ? "bg-white/95 backdrop-blur-xl border-black/5"
+              : "bg-primary-navy/95 backdrop-blur-xl")
           }>
-            <div className="flex flex-col p-1">
-              {link.children.map((child) => (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  className={
-                    "block px-4 py-2 text-[13px] font-medium transition-colors " +
-                    (pathname === child.href
-                      ? "text-accent-gold bg-black/[0.03]"
-                      : (dark && !isElevated)
-                        ? "text-primary-navy/70 hover:text-primary-navy hover:bg-black/5"
-                        : "text-white/70 hover:text-white hover:bg-white/10")
-                  }
-                >
-                  {child.label}
-                </Link>
-              ))}
-            </div>
+            {link.children && (
+              <div className="flex flex-col p-1 w-56">
+                {link.children.map((child) => (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    className={
+                      "block px-4 py-2 text-[13px] font-medium transition-colors " +
+                      (pathname === child.href
+                        ? "text-accent-gold bg-black/[0.03]"
+                        : (dark && !isElevated)
+                          ? "text-primary-navy/70 hover:text-primary-navy hover:bg-black/5"
+                          : "text-white/70 hover:text-white hover:bg-white/10")
+                    }
+                  >
+                    {child.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {link.childrenGroups && (
+              <div className="grid w-[720px] max-w-[90vw] grid-cols-3 gap-6 p-5">
+                {link.childrenGroups.map((group) => (
+                  <div key={group.label} className="space-y-3">
+                    <p
+                      className={
+                        "text-[10px] font-black uppercase tracking-[0.3em] " +
+                        ((dark && !isElevated) ? "text-primary-navy/40" : "text-white/40")
+                      }
+                    >
+                      {group.label}
+                    </p>
+                    <div className="flex flex-col">
+                      {group.links.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          className={
+                            "rounded-sm px-3 py-2 text-[13px] font-medium transition-colors " +
+                            (pathname === child.href
+                              ? "text-accent-gold bg-black/[0.03]"
+                              : (dark && !isElevated)
+                                ? "text-primary-navy/70 hover:text-primary-navy hover:bg-black/5"
+                                : "text-white/70 hover:text-white hover:bg-white/10")
+                          }
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -235,7 +275,7 @@ export function BricknetHeader({
               <div key={link.label} className="space-y-4">
                 <Link
                   href={link.href}
-                  onClick={() => !link.children && setIsMenuOpen(false)}
+                  onClick={() => !link.children && !link.childrenGroups && setIsMenuOpen(false)}
                   className="block text-2xl font-serif text-white hover:text-accent-gold transition-colors"
                 >
                   {link.label}
@@ -251,6 +291,29 @@ export function BricknetHeader({
                       >
                         {child.label}
                       </Link>
+                    ))}
+                  </div>
+                )}
+                {link.childrenGroups && (
+                  <div className="pl-4 space-y-6 border-l border-white/10">
+                    {link.childrenGroups.map((group) => (
+                      <div key={group.label} className="space-y-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">
+                          {group.label}
+                        </p>
+                        <div className="space-y-3">
+                          {group.links.map((child) => (
+                            <Link
+                              key={child.href}
+                              href={child.href}
+                              onClick={() => setIsMenuOpen(false)}
+                              className="block text-lg text-white/60 hover:text-accent-gold transition-colors"
+                            >
+                              {child.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}

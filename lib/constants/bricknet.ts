@@ -1,7 +1,18 @@
+export type NavLinkChild = {
+  label: string;
+  href: string;
+};
+
+export type NavLinkGroup = {
+  label: string;
+  links: NavLinkChild[];
+};
+
 export type NavLink = {
   label: string;
   href: string;
-  children?: NavLink[];
+  children?: NavLinkChild[];
+  childrenGroups?: NavLinkGroup[];
 };
 
 export const bricknetNavLinks: NavLink[] = [
@@ -12,23 +23,42 @@ export const bricknetNavLinks: NavLink[] = [
     children: [
       { label: "About Us", href: "/about-us" },
       { label: "Leadership", href: "/team" },
+      { label: "Company Profile", href: "/company-profile" },
       { label: "Careers", href: "/careers" },
     ],
   },
   {
     label: "Services",
     href: "/services",
-    children: [
-      { label: "SEBI Regulated", href: "/services" },
-      { label: "Other Regulated", href: "/other-regulated-services" },
-      { label: "Unregulated", href: "/unregulated-services" },
-      { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
-      { label: "REIT & InvIT", href: "/reit-invit" },
-      { label: "Facility Agent", href: "/facility-agent" },
-      { label: "Safe Keeping Agent", href: "/safe-keeping-agent" },
-      { label: "Deposit Trustee", href: "/deposit-trustee" },
-      { label: "Security Trustee", href: "/security-trustee-services" },
-      { label: "Escrow & Monitoring", href: "/escrow-monitoring-agency" },
+    childrenGroups: [
+      {
+        label: "SEBI Regulated",
+        links: [
+          { label: "Services Hub", href: "/services" },
+          { label: "Debenture / Bond Trustee", href: "/debenture-bond-trusteeship" },
+          { label: "Securitization Trustee", href: "/securitization-trustee" },
+          { label: "Security Trustee", href: "/security-trustee-services" },
+          { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
+          { label: "REIT & InvIT", href: "/reit-invit" },
+        ],
+      },
+      {
+        label: "Other Regulated",
+        links: [
+          { label: "Other Regulated Hub", href: "/other-regulated-services" },
+          { label: "Facility Agent", href: "/facility-agent" },
+          { label: "Safe Keeping Agent", href: "/safe-keeping-agent" },
+          { label: "Deposit Trustee", href: "/deposit-trustee" },
+          { label: "Escrow & Monitoring", href: "/escrow-monitoring-agency" },
+        ],
+      },
+      {
+        label: "Unregulated",
+        links: [
+          { label: "Unregulated Hub", href: "/unregulated-services" },
+          { label: "Share Pledge Trustee", href: "/share-pledge-trustee" },
+        ],
+      },
     ],
   },
   {
@@ -567,6 +597,7 @@ export const bricknetFooterColumns = [
       { label: "Home", href: "/" },
       { label: "Who We Are", href: "/about-us" },
       { label: "Our Team", href: "/team" },
+      { label: "Company Profile", href: "/company-profile" },
       { label: "Services", href: "/#services" },
       { label: "Research", href: "/research" },
       { label: "Press & Media", href: "/#media" },

@@ -8,7 +8,7 @@ import { BricknetFooter } from "@/components/layout/BricknetFooter";
 import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
 
-import { ServicesAtlas, type ServiceAtlasItem } from "./ServicesAtlas";
+import type { ServiceAtlasItem } from "./ServicesAtlas";
 
 type ParsedService = {
   title: string;
@@ -439,9 +439,82 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <div id="atlas" className="scroll-mt-28">
-        <ServicesAtlas items={services} />
-      </div>
+      <section id="atlas" className="scroll-mt-28 bg-white py-24 lg:py-32" aria-label="Services grid">
+        <div className="wrapper px-5 lg:px-20">
+          <div className="border-b border-primary-navy/10 pb-6" data-aos="fade-up">
+            <span className="inline-flex items-center gap-2 bg-primary-navy px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+              <span className="block size-1.5 bg-accent-gold" aria-hidden="true" />
+              Mandates
+            </span>
+            <h2 className="mt-6 text-4xl font-medium leading-[1.1] text-primary-navy lg:text-6xl">
+              SEBI regulated services
+              <br />
+              in a grid view.
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg leading-relaxed text-primary-navy/60">
+              Scan each service quickly, then open the detailed mandate page.
+            </p>
+          </div>
+
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" data-aos="fade-up" data-aos-delay={150}>
+            {services.map((service) => (
+              <a
+                key={service.id}
+                href={service.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group border border-primary-navy/10 bg-white transition-all hover:border-accent-gold/40"
+              >
+                <div className="relative h-44 w-full overflow-hidden bg-primary-navy/5">
+                  <Image
+                    src={service.imageSrc}
+                    alt={service.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw"
+                  />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/20 to-transparent"
+                    aria-hidden="true"
+                  />
+                  <div className="absolute left-5 top-5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                    {service.number}
+                  </div>
+                </div>
+
+                <div className="flex h-full flex-col gap-6 p-8">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
+                      {service.shortTitle}
+                    </p>
+                    <h3 className="mt-4 text-2xl font-medium leading-tight text-primary-navy group-hover:text-accent-gold">
+                      {service.title}
+                    </h3>
+                    <p className="mt-4 text-sm leading-relaxed text-primary-navy/60">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-auto flex flex-wrap gap-2">
+                    {service.tags.map((tag) => (
+                      <span
+                        key={`${service.id}-${tag}`}
+                        className="border border-primary-navy/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/50"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="text-[11px] font-black uppercase tracking-[0.25em] text-primary-navy/60 group-hover:text-accent-gold">
+                    Open mandate <span className="text-accent-gold">→</span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Why Beacon - evidence grid */}
       <section id="why-beacon" className="relative overflow-hidden bg-base-white py-24 lg:py-32" aria-label="Why Beacon">

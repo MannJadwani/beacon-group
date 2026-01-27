@@ -48,7 +48,7 @@ Beacon Trusteeship Limited - Trusteeship Service Provider in India
 
 SEBI Regulated Services
 
-# Securitization: Securitized Debt Instruments (SDIs)
+# Share Pledge Trustee (For Listed Shares)
 
 ## Contact us
 
@@ -93,53 +93,28 @@ Captcha validation is required.
 
 Submit
 
-Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy remote sale of a financial asset or a pool of such homogenous assets (Asset Pool) in return for immediate cash payments. It is an effective method actively used by Non-Banking Finance Companies (NBFCs), Housing Finance Companies (HFCs) & Microfinance Companies (MFCs), to cash-in on illiquid assets in order to enable finance of future lending activities at an economic cost of funds.
+One of the common transactions we come across in today’s market is Loan against Shares. In this kind of a product a lender (typically a Bank or an NBFC) lends against adequate collateral. The collateral is normally the pledge of listed shares (in most cases). In some cases one may have to deal with be partial collateral of liquid listed shares along with unlisted shares as collateral. The lenders decide a mechanism to monitor these on a daily basis. The Trustee here plays the role of monitoring these shares for the lenders so that adequate margin is maintained against the market value of shares offered under the pledge. The margin calculation is as advised by the lender(s) which adequacy depends upon the volatility of pledged shares and/or market conditions.
 
-  
+* Pledge of shares are held by us for the benefit of the lender for the entire tenor of the transaction.
+* Valuation of shares is continuously conducted by us for the listed shares pledged with us on a daily, weekly & monthly basis. Daily reports are generated & sent to the relevant lenders along with the requirement of the margins
+* Event of Default trigger is issued in cases & we as a Trustee invoke the pledge on the instructions received from the lender(s)
+* In cases where defaults are triggered, shares may be sold by us on behalf of the lender(s) through various broking entities that we may choose to appoint.
+* There have been cases of shares pledged through the consortium lending method for which we play a crucial role of monitoring on behalf of the lender(s). Here too like any other collateral, we behave like our role in case of a Security Trustee on behalf of multiple lenders. It’s convenient for the borrower company as well as the entire group of lenders
+* Benefits to Borrower & Lender
 
-In Securitization, the underlying asset pool is transferred to a Special Purpose Vehicle (SPV) which in turn issues securities known as Pass Through Certificates (PTCs) to the Investors, mostly Banks, in exchange of incoming cash investment. While globally SPVs are set up in different forms, SPVs in India are largely set up as Trust. We act as Trustee to the said SPV. We act as a Securitization Trustee for transactions involving.
+### Benefits to Borrower & Lender
 
-  
+* Hassle free pledge of securities in physical & demat form.
+* Pledge done in favour of an independent non-partisan third party.
+* Daily / Periodic valuation of listed securities.
+* Expeditious operations enable timely disbursement of sanctioned facilities.
+* Monitoring of:
 
-1. Asset Backed Securitization (ABS)
-
-2. Mortgage Backed Securitization (MBS)
-
-3. Micro Credit Backed Securitization
-
-### As a Securitization Trustee, we assist you in:
-
-* Drafting & Vetting of Legal Documents.
-* Compliance with RBI Guidelines and SEBI Guidelines.
-* Regular analysis of Servicer reports.
-* Ensuring timely and accurate payouts.
-* Co-ordination amongst Originators, Arrangers, Legal Counsels, Investors, Servicers, Bankers & Rating Agencies among others.
-* Credit enhancement/liquidity facility invocation (in case of shortfall) as per RBI Guidelines.
-* Enabling smooth flow of proceeds from Investors to the Originator.
-* Quarterly Audit for various trusts along with issuance of TDS certificates to the beneficiaries wherever TDS implications are involved.
-* Monitoring the credit enhancement as stipulated by the rating agency.
-* Periodic (monthly / quarterly reports) along with future cash flows factoring prepayments to the investor, originator & rating agency.
-* Prompt response to Investor queries & clarifications sought.
-* Redemption of the PTCs on completion of the payouts
-
-### Benefits to Originators & Investors
-
-### Our inputs on transaction structure/ Information Memorandum along with detailed financial modelling. Expeditious work flow to achieve time efficient:
-
-* Execution of legal documents
-* Trust set-up & due dilligence
-* Issuance of PTCs in physical & dematerialized
-* Opening & management of Collection & Payout Account
-
-### In-house system generated reports for:
-
-* Servicer
-* Originator
-* Credit Enhancement
-* Collections & Payout Account
-* TDS Compliance & Certificates
-
-### Timely reminders to ensure compliance with periodic reports to be submitted.
+  + Asset Cover maintained
+  + Trigger Events
+  + Compliance with terms of sanction
+* Diligent retention & release of securities pledged.
+* Proactive post-default action for invocation of pledge in adherence with Lender instructions & extant laws, regulations & guidelines.
 
 ### We Also Offer :
 
@@ -178,7 +153,7 @@ Jaydeep Bhattacharya
 
 **Executive Director**
 
-**[+91 9324724949](tel:+91 9324724949)**
+**[+91 9324724949](tel:+919324724949)**
 
 ![Phone](https://beacontrustee.co.in/assets/images/phone.png)
 
@@ -186,7 +161,7 @@ Veena Nautiyal
 
 **Associate Director**
 
-**[+91 9324724945](tel:+91 9324724945)**
+**[+91 9324724945](tel:+919324724945)**
 
 ![Phone](https://beacontrustee.co.in/assets/images/phone.png)
 
@@ -194,7 +169,15 @@ Deepavali Vankalu
 
 **Vice President**
 
-**[+91 9324724944](tel:+91 9324724944)**
+**[+91 9324724944](tel:+919324724944)**
+
+![Phone](https://beacontrustee.co.in/assets/images/phone.png)
+
+Vinod Manjrekar
+
+Vice President
+
+**[+91 8976944231](tel:+918976944231)**
 
 ### Delhi Office
 
@@ -204,7 +187,7 @@ Kamal Paul
 
 **Associate Vice President**
 
-**[+91 7208967004](tel:+91 7208967004)**
+**[+91 7208967004](tel:+917208967004)**
 
 ### Hyderabad Office
 
@@ -214,7 +197,7 @@ Paul Samuel
 
 **Regional Head - AP & Telangana**
 
-**[+91 9848805576](tel:+91 9848805576)**
+**[+91 9848805576](tel:+919848805576)**
 
 ### Bangalore Office
 
@@ -224,7 +207,7 @@ Deepak Kulkarni
 
 **Senior Manager**
 
-**[+91 9136929255](tel:+91 9136929255)**
+**[+91 9136929255](tel:+919848805576)**
 
 ### Chennai Office
 
@@ -234,7 +217,7 @@ Sunil Menon
 
 **Senior Manager**
 
-**[+91 7208967017](tel:+91 7208967017)**
+**[+91 7208967017](tel:+919848805576)**
 
 ## Testimonials
 
@@ -466,11 +449,11 @@ Bandra (E), Mumbai 400051
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#b6dfd8c0d3c5c2d9c4d1c4dfd3c0d7d8d5d3c5f6d4d3d7d5d9d8c2c4c3c5c2d3d398d5d998dfd8)
+## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#3851564e5d4b4c574a5f4a515d4e59565b5d4b785a5d595b57564c4a4d4b4c5d5d165b57165156)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#bfd7cdffdddadedcd0d1cbcdcacccbdada91dcd091d6d1)
+## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#4c243e0c2e292d2f2322383e393f382929622f23622522)
 
 ##### Company
 

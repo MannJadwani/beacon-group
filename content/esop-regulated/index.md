@@ -48,32 +48,11 @@ Beacon Trusteeship Limited - Trusteeship Service Provider in India
 
 SEBI Regulated Services
 
-# Securitization: Securitized Debt Instruments (SDIs)
+# ESOP (For Listed Shares)
 
 ## Contact us
 
 Select Services\*
-Alternative Investment Fund
-Bond Trustee
-Commercial Paper Trustee
-Debenture Trustee
-Enforcement Activity
-Escrow Agent
-Facility Agent
-Legal Documentation
-Safe Keeping
-Securitization (DA)
-Security Trustee
-Share Pledge Trustee
-ESOP Trustee
-Securitization (PTC)
-Securitization (C&P-PLI)
-Securitization (SDI)
-Securitization (C&P-PCE)
-Employee Welfare Trust
-Advisory Services
-REIT & InvIT
-Deposit Trustee
 
 Select Location\*
 Mumbai
@@ -93,53 +72,16 @@ Captcha validation is required.
 
 Submit
 
-Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy remote sale of a financial asset or a pool of such homogenous assets (Asset Pool) in return for immediate cash payments. It is an effective method actively used by Non-Banking Finance Companies (NBFCs), Housing Finance Companies (HFCs) & Microfinance Companies (MFCs), to cash-in on illiquid assets in order to enable finance of future lending activities at an economic cost of funds.
+Trustee for ESOP - Employee Stock Options Plan for the plan / scheme offered pursuant to Securities and Exchange Board of India (Share Based Employee Benefits and Sweat Equity) Regulations, 2021
 
-  
+### Being a one-stop Trustee to our clients, we also offer
 
-In Securitization, the underlying asset pool is transferred to a Special Purpose Vehicle (SPV) which in turn issues securities known as Pass Through Certificates (PTCs) to the Investors, mostly Banks, in exchange of incoming cash investment. While globally SPVs are set up in different forms, SPVs in India are largely set up as Trust. We act as Trustee to the said SPV. We act as a Securitization Trustee for transactions involving.
-
-  
-
-1. Asset Backed Securitization (ABS)
-
-2. Mortgage Backed Securitization (MBS)
-
-3. Micro Credit Backed Securitization
-
-### As a Securitization Trustee, we assist you in:
-
-* Drafting & Vetting of Legal Documents.
-* Compliance with RBI Guidelines and SEBI Guidelines.
-* Regular analysis of Servicer reports.
-* Ensuring timely and accurate payouts.
-* Co-ordination amongst Originators, Arrangers, Legal Counsels, Investors, Servicers, Bankers & Rating Agencies among others.
-* Credit enhancement/liquidity facility invocation (in case of shortfall) as per RBI Guidelines.
-* Enabling smooth flow of proceeds from Investors to the Originator.
-* Quarterly Audit for various trusts along with issuance of TDS certificates to the beneficiaries wherever TDS implications are involved.
-* Monitoring the credit enhancement as stipulated by the rating agency.
-* Periodic (monthly / quarterly reports) along with future cash flows factoring prepayments to the investor, originator & rating agency.
-* Prompt response to Investor queries & clarifications sought.
-* Redemption of the PTCs on completion of the payouts
-
-### Benefits to Originators & Investors
-
-### Our inputs on transaction structure/ Information Memorandum along with detailed financial modelling. Expeditious work flow to achieve time efficient:
-
-* Execution of legal documents
-* Trust set-up & due dilligence
-* Issuance of PTCs in physical & dematerialized
-* Opening & management of Collection & Payout Account
-
-### In-house system generated reports for:
-
-* Servicer
-* Originator
-* Credit Enhancement
-* Collections & Payout Account
-* TDS Compliance & Certificates
-
-### Timely reminders to ensure compliance with periodic reports to be submitted.
+* Trust Setup and Registration
+* Opening of Accounts such as Bank Account, DEMAT Account, Trading Account etc.
+* Processing transactions of securities in line with Plan / Scheme and fund transfers as may be applicable.
+* Maintenance of records.
+* Auditor appointment and Compliance with applicable Tax laws
+* Ensuring periodic compliance with applicable laws and regulations.
 
 ### We Also Offer :
 
@@ -178,7 +120,7 @@ Jaydeep Bhattacharya
 
 **Executive Director**
 
-**[+91 9324724949](tel:+91 9324724949)**
+**[+91 9324724949](tel:+919324724949)**
 
 ![Phone](https://beacontrustee.co.in/assets/images/phone.png)
 
@@ -186,7 +128,7 @@ Veena Nautiyal
 
 **Associate Director**
 
-**[+91 9324724945](tel:+91 9324724945)**
+**[+91 9324724945](tel:+919324724945)**
 
 ![Phone](https://beacontrustee.co.in/assets/images/phone.png)
 
@@ -194,7 +136,7 @@ Deepavali Vankalu
 
 **Vice President**
 
-**[+91 9324724944](tel:+91 9324724944)**
+**[+91 9324724944](tel:+919324724944)**
 
 ### Delhi Office
 
@@ -204,7 +146,7 @@ Kamal Paul
 
 **Associate Vice President**
 
-**[+91 7208967004](tel:+91 7208967004)**
+**[+91 7208967004](tel:+917208967004)**
 
 ### Hyderabad Office
 
@@ -214,7 +156,7 @@ Paul Samuel
 
 **Regional Head - AP & Telangana**
 
-**[+91 9848805576](tel:+91 9848805576)**
+**[+91 9848805576](tel:+919848805576)**
 
 ### Bangalore Office
 
@@ -224,7 +166,7 @@ Deepak Kulkarni
 
 **Senior Manager**
 
-**[+91 9136929255](tel:+91 9136929255)**
+**[+91 9136929255](tel:+919848805576)**
 
 ### Chennai Office
 
@@ -234,7 +176,7 @@ Sunil Menon
 
 **Senior Manager**
 
-**[+91 7208967017](tel:+91 7208967017)**
+**[+91 7208967017](tel:+919848805576)**
 
 ## Testimonials
 
@@ -462,15 +404,15 @@ Bandra (E), Mumbai 400051
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#6b0804051f0a081f2b090e0a0804051f191e181f0e0e450804450205)
+## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#8eede1e0faefedfaceecebefede1e0fafcfbfdfaebeba0ede1a0e7e0)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#b6dfd8c0d3c5c2d9c4d1c4dfd3c0d7d8d5d3c5f6d4d3d7d5d9d8c2c4c3c5c2d3d398d5d998dfd8)
+## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#1871766e7d6b6c776a7f6a717d6e79767b7d6b587a7d797b77766c6a6d6b6c7d7d367b77367176)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#bfd7cdffdddadedcd0d1cbcdcacccbdada91dcd091d6d1)
+## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#325a4072505753515d5c464047414657571c515d1c5b5c)
 
 ##### Company
 

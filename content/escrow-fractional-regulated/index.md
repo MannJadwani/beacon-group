@@ -48,32 +48,11 @@ Beacon Trusteeship Limited - Trusteeship Service Provider in India
 
 SEBI Regulated Services
 
-# Securitization: Securitized Debt Instruments (SDIs)
+# Escrow Services: Fractional Shares Escrow
 
 ## Contact us
 
 Select Services\*
-Alternative Investment Fund
-Bond Trustee
-Commercial Paper Trustee
-Debenture Trustee
-Enforcement Activity
-Escrow Agent
-Facility Agent
-Legal Documentation
-Safe Keeping
-Securitization (DA)
-Security Trustee
-Share Pledge Trustee
-ESOP Trustee
-Securitization (PTC)
-Securitization (C&P-PLI)
-Securitization (SDI)
-Securitization (C&P-PCE)
-Employee Welfare Trust
-Advisory Services
-REIT & InvIT
-Deposit Trustee
 
 Select Location\*
 Mumbai
@@ -93,53 +72,33 @@ Captcha validation is required.
 
 Submit
 
-Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy remote sale of a financial asset or a pool of such homogenous assets (Asset Pool) in return for immediate cash payments. It is an effective method actively used by Non-Banking Finance Companies (NBFCs), Housing Finance Companies (HFCs) & Microfinance Companies (MFCs), to cash-in on illiquid assets in order to enable finance of future lending activities at an economic cost of funds.
+Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc., on behalf of two or more transacting parties. The appointment & scope of work of an Escrow Agent is broadly described in an Escrow Agreement executed by & amongst the Escrow Agent & the transacting parties. An Escrow Agent plays a crucial role in:
 
-  
+* Timely Debt Servicing
+* Business Acquisition
+* Private Equity Transactions
+* Retention of Securities
+* Disputed Liabilities
+* P2P Platforms
+* Online Gaming & Shopping Platforms
+* E-Commerce transactions
+* International Trade & Export Finance
+* Loan Against Securities
 
-In Securitization, the underlying asset pool is transferred to a Special Purpose Vehicle (SPV) which in turn issues securities known as Pass Through Certificates (PTCs) to the Investors, mostly Banks, in exchange of incoming cash investment. While globally SPVs are set up in different forms, SPVs in India are largely set up as Trust. We act as Trustee to the said SPV. We act as a Securitization Trustee for transactions involving.
+### As an Escrow Agent, Beacon Trusteeship offers the following services:
 
-  
-
-1. Asset Backed Securitization (ABS)
-
-2. Mortgage Backed Securitization (MBS)
-
-3. Micro Credit Backed Securitization
-
-### As a Securitization Trustee, we assist you in:
-
-* Drafting & Vetting of Legal Documents.
-* Compliance with RBI Guidelines and SEBI Guidelines.
-* Regular analysis of Servicer reports.
-* Ensuring timely and accurate payouts.
-* Co-ordination amongst Originators, Arrangers, Legal Counsels, Investors, Servicers, Bankers & Rating Agencies among others.
-* Credit enhancement/liquidity facility invocation (in case of shortfall) as per RBI Guidelines.
-* Enabling smooth flow of proceeds from Investors to the Originator.
-* Quarterly Audit for various trusts along with issuance of TDS certificates to the beneficiaries wherever TDS implications are involved.
-* Monitoring the credit enhancement as stipulated by the rating agency.
-* Periodic (monthly / quarterly reports) along with future cash flows factoring prepayments to the investor, originator & rating agency.
-* Prompt response to Investor queries & clarifications sought.
-* Redemption of the PTCs on completion of the payouts
-
-### Benefits to Originators & Investors
-
-### Our inputs on transaction structure/ Information Memorandum along with detailed financial modelling. Expeditious work flow to achieve time efficient:
-
-* Execution of legal documents
-* Trust set-up & due dilligence
-* Issuance of PTCs in physical & dematerialized
-* Opening & management of Collection & Payout Account
-
-### In-house system generated reports for:
-
-* Servicer
-* Originator
-* Credit Enhancement
-* Collections & Payout Account
-* TDS Compliance & Certificates
-
-### Timely reminders to ensure compliance with periodic reports to be submitted.
+* Drafting & Vetting of Escrow Agreement
+* Set up of Escrow Mechanism envisaging future cash flows & waterfall disbursement.
+* Adept documentation & synergizing of Escrow Mechanism with terms of sanctioned facilities.
+* Expeditious opening & management of:
+* Escrow Current Account with Banks for retention of funds
+* Escrow Demat Account with Depositories for retention of securities
+* Ensuring smooth flow of funds to & fro Escrow Account
+* EMeticulous adherence to extant covenants, provisions & T&Cs of the Escrow Agreement/li>
+* Monitoring of Fund Movement
+* Ensuring maintenance of Debt Service Reserve Amount (DSRA)
+* Periodic/Daily valuation & monitoring of securities.
+* Release of assets post assurance due diligence & compliance of extant terms.
 
 ### We Also Offer :
 
@@ -462,15 +421,15 @@ Bandra (E), Mumbai 400051
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#6b0804051f0a081f2b090e0a0804051f191e181f0e0e450804450205)
+## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#fe9d91908a9f9d8abe9c9b9f9d91908a8c8b8d8a9b9bd09d91d09790)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#b6dfd8c0d3c5c2d9c4d1c4dfd3c0d7d8d5d3c5f6d4d3d7d5d9d8c2c4c3c5c2d3d398d5d998dfd8)
+## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#6d04031b081e19021f0a1f04081b0c030e081e2d0f080c0e0203191f181e190808430e02430403)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#bfd7cdffdddadedcd0d1cbcdcacccbdada91dcd091d6d1)
+## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#89e1fbc9ebece8eae6e7fdfbfcfafdececa7eae6a7e0e7)
 
 ##### Company
 

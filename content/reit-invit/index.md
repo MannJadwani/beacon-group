@@ -428,15 +428,15 @@ Bandra (E), Mumbai 400051
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#2b4844455f4a485f6b494e4a4844455f595e585f4e4e054844054245)
+## For any enquiry mail us on [[email protected]](/cdn-cgi/l/email-protection#0d6e6263796c6e794d6f686c6e6263797f787e796868236e62236463)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#cba2a5bdaeb8bfa4b9acb9a2aebdaaa5a8aeb88ba9aeaaa8a4a5bfb9beb8bfaeaee5a8a4e5a2a5)
+## For any investor grievance mail us on [[email protected]](/cdn-cgi/l/email-protection#7d14130b180e09120f1a0f14180b1c131e180e3d1f181c1e1213090f080e091818531e12531413)
 
 ![Email](https://beacontrustee.co.in/assets/images/email.png)
 
-## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#29415b694b4c484a46475d5b5c5a5d4c4c074a46074047)
+## To submit your resume [[email protected]](/cdn-cgi/l/email-protection#fb9389bb999e9a9894958f898e888f9e9ed59894d59295)
 
 ##### Company
 

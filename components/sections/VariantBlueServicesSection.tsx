@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import { bricknetServices } from "@/lib/constants/bricknet";
 
@@ -27,8 +28,9 @@ export function VariantBlueServicesSection() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {bricknetServices.map((service, idx) => (
-            <div
+            <Link
               key={service.number}
+              href={service.href}
               className="group relative overflow-hidden rounded-3xl bg-white/5 backdrop-blur-sm p-10 transition-all hover:bg-white/10 hover:shadow-2xl hover:-translate-y-1 lg:p-12"
               data-aos="fade-up"
               data-aos-delay={idx * 100}
@@ -59,11 +61,11 @@ export function VariantBlueServicesSection() {
               </div>
 
               <div className="mt-10 pt-10">
-                <button className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm transition-all group-hover:bg-[#EDE44C] group-hover:text-[#183EFA] shadow-lg">
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-sm transition-all group-hover:bg-[#EDE44C] group-hover:text-[#183EFA] shadow-lg">
                   →
-                </button>
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

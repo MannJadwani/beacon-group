@@ -40,6 +40,10 @@ export const bricknetNavLinks: NavLink[] = [
           { label: "Security Trustee", href: "/security-trustee-services" },
           { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
           { label: "REIT & InvIT", href: "/reit-invit" },
+          { label: "Escrow: Fractional Shares", href: "/escrow-fractional-regulated" },
+          { label: "Escrow: Investor Protection Fund", href: "/escrow-ipef-regulated" },
+          { label: "ESOP Trustee", href: "/esop-regulated" },
+          { label: "Share Pledge Trustee (Listed)", href: "/share-pledge-trustee-regulated" },
         ],
       },
       {
@@ -118,6 +122,7 @@ export const bricknetServices = [
     title: "Debenture Trustee",
     description:
       "Paving a smooth road for debt fund raising while protecting debenture holder interests.",
+    href: "/debenture-bond-trusteeship",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-1.jpg",
     imageAlt: "Debenture trustee services",
   },
@@ -126,6 +131,7 @@ export const bricknetServices = [
     title: "Security Trustee",
     description:
       "Holding and administering security for lenders with disciplined documentation and oversight.",
+    href: "/security-trustee-services",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-2.jpg",
     imageAlt: "Security trustee services",
   },
@@ -134,6 +140,7 @@ export const bricknetServices = [
     title: "Alternative Investment Funds",
     description:
       "Acting as pillars for fund managers with trusted governance and trustee administration.",
+    href: "/alternative-investment-fund",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-3.jpg",
     imageAlt: "Alternative investment fund trustee services",
   },
@@ -142,6 +149,7 @@ export const bricknetServices = [
     title: "Securitization",
     description:
       "Assisting in unlocking capital through securitization mandates across DA, PTC, and SDI.",
+    href: "/securitization-trustee",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-4.jpg",
     imageAlt: "Securitization trustee services",
   },
@@ -150,6 +158,7 @@ export const bricknetServices = [
     title: "Escrow Services",
     description:
       "Enabling responsible transactions with escrow and monitoring services tailored to complex deals.",
+    href: "/escrow-monitoring-agency",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-5.jpg",
     imageAlt: "Escrow services",
   },
@@ -158,6 +167,7 @@ export const bricknetServices = [
     title: "Research",
     description:
       "Transforming into a digital enterprise with research reports and regulatory updates.",
+    href: "/research",
     imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-6.jpg",
     imageAlt: "Beacon research updates",
   },

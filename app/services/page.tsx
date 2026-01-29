@@ -41,6 +41,24 @@ function parseOuterMarkdownLink(line: string) {
   return fallback?.[1] ?? "";
 }
 
+const SERVICE_LINK_MAP: Record<string, string> = {
+  "https://beacontrustee.co.in/services": "/services",
+  "https://beacontrustee.co.in/debenture-bond-trusteeship-listed": "/debenture-bond-trusteeship",
+  "https://beacontrustee.co.in/alternative-investment-fund": "/alternative-investment-fund",
+  "https://beacontrustee.co.in/securitization-trustee-regulated": "/securitization-trustee",
+  "https://beacontrustee.co.in/reit-invit": "/reit-invit",
+  "https://beacontrustee.co.in/escrow-fractional-regulated": "/escrow-fractional-regulated",
+  "https://beacontrustee.co.in/escrow-ipef-regulated": "/escrow-ipef-regulated",
+  "https://beacontrustee.co.in/esop-regulated": "/esop-regulated",
+  "https://beacontrustee.co.in/share-pledge-trustee-regulated": "/share-pledge-trustee-regulated",
+};
+
+function mapServiceHref(href: string) {
+  if (!href) return "/services";
+  const clean = href.replace(/\/$/, "");
+  return SERVICE_LINK_MAP[clean] ?? href;
+}
+
 function shortTitle(title: string) {
   const t = title.toLowerCase();
 
@@ -236,7 +254,7 @@ function parseServicesPage(markdown: string): {
       title: s.title,
       shortTitle: shortTitle(s.title),
       description: s.description,
-      href: s.href || "https://beacontrustee.co.in/services",
+      href: mapServiceHref(s.href),
       imageSrc: imageForService(s.title, idx),
       tags: tagsForService(s.title),
     };
@@ -457,61 +475,65 @@ export default function ServicesPage() {
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" data-aos="fade-up" data-aos-delay={150}>
-            {services.map((service) => (
-              <a
-                key={service.id}
-                href={service.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group border border-primary-navy/10 bg-white transition-all hover:border-accent-gold/40"
-              >
-                <div className="relative h-44 w-full overflow-hidden bg-primary-navy/5">
-                  <Image
-                    src={service.imageSrc}
-                    alt={service.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw"
-                  />
-                  <div
-                    className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/20 to-transparent"
-                    aria-hidden="true"
-                  />
-                  <div className="absolute left-5 top-5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                    {service.number}
-                  </div>
-                </div>
+            {services.map((service) => {
+              const isExternal = service.href.startsWith("http");
 
-                <div className="flex h-full flex-col gap-6 p-8">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
-                      {service.shortTitle}
-                    </p>
-                    <h3 className="mt-4 text-2xl font-medium leading-tight text-primary-navy group-hover:text-accent-gold">
-                      {service.title}
-                    </h3>
-                    <p className="mt-4 text-sm leading-relaxed text-primary-navy/60">
-                      {service.description}
-                    </p>
+              return (
+                <a
+                  key={service.id}
+                  href={service.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  className="group border border-primary-navy/10 bg-white transition-all hover:border-accent-gold/40"
+                >
+                  <div className="relative h-44 w-full overflow-hidden bg-primary-navy/5">
+                    <Image
+                      src={service.imageSrc}
+                      alt={service.title}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(min-width: 1024px) 360px, (min-width: 768px) 50vw, 100vw"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-primary-navy/80 via-primary-navy/20 to-transparent"
+                      aria-hidden="true"
+                    />
+                    <div className="absolute left-5 top-5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                      {service.number}
+                    </div>
                   </div>
 
-                  <div className="mt-auto flex flex-wrap gap-2">
-                    {service.tags.map((tag) => (
-                      <span
-                        key={`${service.id}-${tag}`}
-                        className="border border-primary-navy/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/50"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  <div className="flex h-full flex-col gap-6 p-8">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
+                        {service.shortTitle}
+                      </p>
+                      <h3 className="mt-4 text-2xl font-medium leading-tight text-primary-navy group-hover:text-accent-gold">
+                        {service.title}
+                      </h3>
+                      <p className="mt-4 text-sm leading-relaxed text-primary-navy/60">
+                        {service.description}
+                      </p>
+                    </div>
 
-                  <div className="text-[11px] font-black uppercase tracking-[0.25em] text-primary-navy/60 group-hover:text-accent-gold">
-                    Open mandate <span className="text-accent-gold">→</span>
+                    <div className="mt-auto flex flex-wrap gap-2">
+                      {service.tags.map((tag) => (
+                        <span
+                          key={`${service.id}-${tag}`}
+                          className="border border-primary-navy/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/50"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="text-[11px] font-black uppercase tracking-[0.25em] text-primary-navy/60 group-hover:text-accent-gold">
+                      Open mandate <span className="text-accent-gold">→</span>
+                    </div>
                   </div>
-                </div>
-              </a>
-            ))}
+                </a>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -41,97 +41,103 @@ export default function ContactPage() {
 
   const lines = md.split(/\r?\n/);
 
-  const phoneMatch = lines.find((l) => l.includes("+91"));
-  const phone = phoneMatch ? normalizeText(phoneMatch.replace(/\[(\+91\s*[\d\s]+)\]\(tel:[^)]+\)/, "").replace(/[+91\s*[\d\s]+/, "").trim()) : "+91 9555449955";
+  const phoneMatch = md.match(/\+91[\d\s]{6,}/);
+  const phone = phoneMatch ? phoneMatch[0].replace(/\s+/g, " ").trim() : "+91 9555449955";
 
-  const emailMatches = md.match(/\/cdn-cgi\/l\/email-protection#([0-9a-fA-F]+)/g);
-  const generalEmail = emailMatches && emailMatches[1] ? decodeCloudflareEmail(emailMatches[1]) : "contact@beacontrustee.co.in";
+  const emailMatch = Array.from(md.matchAll(/\/cdn-cgi\/l\/email-protection#([0-9a-fA-F]+)/g));
+  const generalEmail = emailMatch[0]?.[1] ? decodeCloudflareEmail(emailMatch[0][1]) : "contact@beacontrustee.co.in";
 
-  const addressMatch = lines.find((l) => l.includes("Registered & Corporate Office") || l.includes("## Registered & Corporate Office"));
-  const addressSlice = addressMatch
-    ? lines.slice(lines.indexOf(addressMatch), lines.indexOf(addressMatch) + 12)
-    : [];
+  const contentStartIndex = lines.findIndex((l) => l.trim() === "# Contact us");
+  const contentLines = contentStartIndex >= 0 ? lines.slice(contentStartIndex) : lines;
 
-  const addressLines = addressSlice
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith("![") && !l.startsWith("![]"));
+  const addressStartIndex = contentLines.findIndex((l) =>
+    l.includes("Registered & Corporate Office") || l.includes("## Registered & Corporate Office"),
+  );
 
-  const address = normalizeText(addressLines.join(" "));
+  const addressHeader = addressStartIndex >= 0 ? contentLines[addressStartIndex] : "";
+  const addressLineMatch = contentLines
+    .slice(addressStartIndex + 1)
+    .find((line) => line.trim() && !line.startsWith("!") && !line.startsWith("##") && !line.includes("email-protection"));
 
-  const servicesHeadingIndex = lines.findIndex((l) => l.trim() === "Select Services*");
+  const address = normalizeText(`${addressHeader.replace(/^##\s+/, "")} ${addressLineMatch ?? ""}`.trim());
 
-  const servicesSlice = lines.slice(servicesHeadingIndex + 1);
+  const servicesHeadingIndex = contentLines.findIndex((l) => l.trim() === "Select Services*");
+
+  const servicesSlice = contentLines.slice(servicesHeadingIndex + 1);
   const services: string[] = [];
 
   for (let i = 0; i < servicesSlice.length; i++) {
     const line = servicesSlice[i].trim();
-    if (!line || line.startsWith("##") || line.startsWith("Select")) continue;
+    if (!line || line.startsWith("##") || line.startsWith("Select Services")) continue;
+    if (line.startsWith("Select Location") || line.startsWith("Captcha") || line.startsWith("Submit")) break;
     services.push(line);
-    if (
-      line.startsWith("Select Location") ||
-      line.startsWith("Captcha") ||
-      line.startsWith("Submit")
-    )
-      break;
   }
 
-  const locationHeadingIndex = lines.findIndex((l) => l.trim() === "Select Location*");
+  const locationHeadingIndex = contentLines.findIndex((l) => l.trim() === "Select Location*");
   const locationStartIndex = locationHeadingIndex + 1;
-  const locationHeadingEndIndex = lines.findIndex((l, idx) => idx > locationStartIndex && l.trim().startsWith("##"));
+  const locationHeadingEndIndex = contentLines.findIndex((l, idx) => idx > locationStartIndex && l.trim().startsWith("##"));
 
-  const locations = [];
+  const locationOptions: Array<{ name: string }> = [];
 
-  for (let idx = locationStartIndex + 1; idx < (locationHeadingEndIndex > 0 ? locationHeadingEndIndex : lines.length); idx++) {
-    const line = lines[idx].trim();
+  for (let idx = locationStartIndex; idx < (locationHeadingEndIndex > 0 ? locationHeadingEndIndex : contentLines.length); idx++) {
+    const line = contentLines[idx].trim();
     if (!line) continue;
 
-    if (line.startsWith("##") || line.startsWith("Captcha")) continue;
+    if (line.startsWith("##") || line.startsWith("Captcha") || line.startsWith("Submit")) break;
+    if (line.startsWith("Select")) continue;
 
-    if (line.startsWith("*")) {
-      const name = normalizeText(line.replace(/^\*\s+/, ""));
-      if (!name) continue;
-      locations.push({ name, type: "Other" });
-      continue;
-    }
+    const name = normalizeText(line.replace(/^\*\s+/, ""));
+    if (!name || name.startsWith("![")) continue;
+    locationOptions.push({ name });
+  }
 
-    const imageMatch = line.match(/^!\[\[([^\]]*)\]\(([^)]+)\)/);
+  const officeSectionIndex = contentLines.findIndex((l) => l.trim() === "## Our Offices");
+  const officeLines = officeSectionIndex >= 0 ? contentLines.slice(officeSectionIndex + 1) : [];
+  const locations: Array<{ name: string; type: string; address?: string; image?: string }> = [];
+  let pendingImage: string | undefined;
+  let pendingOfficeType: string | undefined;
+
+  for (let idx = 0; idx < officeLines.length; idx++) {
+    const line = officeLines[idx].trim();
+    if (!line) continue;
+    if (line.startsWith("## ")) break;
+
+    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/);
     if (imageMatch) {
-      const image = absolutizeBeaconPath(imageMatch[2]);
-      const name = normalizeText(imageMatch[1]);
-      locations.push({ name, type: "Image", image });
+      pendingImage = absolutizeBeaconPath(imageMatch[2]);
       continue;
     }
 
     const officeTypeMatch = line.match(/^(Registered|Rep\.|Branch)\s+Office/i);
     if (officeTypeMatch) {
-      const type = officeTypeMatch[1].includes("Registered") ? "Registered" : officeTypeMatch[1].includes("Rep.") ? "Rep" : "Branch";
-      const addressLines2 = [];
-      let j = idx + 1;
-      while (j < lines.length) {
-        const l2 = lines[j].trim();
-        if (!l2 || l2.startsWith("###") || l2.startsWith("![") || l2.startsWith("##")) break;
-        addressLines2.push(l2);
-        j++;
-      }
-      const address = normalizeText(addressLines2.join(" "));
-      locations.push({ name, type, address });
+      pendingOfficeType = officeTypeMatch[1].includes("Registered")
+        ? "Registered"
+        : officeTypeMatch[1].includes("Rep.")
+          ? "Rep"
+          : "Branch";
       continue;
     }
 
-    const nameMatch = line.match(/^##\s+([A-Z][a-z\s]+(?:\s+[A-Z][a-z]*)*$/);
+    const nameMatch = line.match(/^###\s+(.+)/);
     if (nameMatch) {
       const name = normalizeText(nameMatch[1]);
       const addressLines2 = [];
       let j = idx + 1;
-      while (j < lines.length) {
-        const l2 = lines[j].trim();
-        if (!l2 || l2.startsWith("![") || l2.startsWith("##")) break;
+      while (j < officeLines.length) {
+        const l2 = officeLines[j].trim();
+        if (!l2 || l2.startsWith("![") || l2.startsWith("##") || l2.startsWith("###")) break;
         addressLines2.push(l2);
         j++;
       }
       const address = normalizeText(addressLines2.join(" "));
-      locations.push({ name, type: "City", address });
-      continue;
+      locations.push({
+        name,
+        type: pendingOfficeType ?? "City",
+        address,
+        image: pendingImage,
+      });
+      pendingImage = undefined;
+      pendingOfficeType = undefined;
     }
   }
 
@@ -397,10 +403,9 @@ export default function ContactPage() {
                           </label>
                           <select className="w-full border border-primary-navy/10 bg-white px-4 py-3 text-primary-navy outline-none focus:border-accent-gold">
                             <option value="">Select a location</option>
-                            {locations.map((loc) => (
-                              <option key={loc.name} value={loc.name} disabled={loc.type !== "City"}>
+                            {locationOptions.map((loc) => (
+                              <option key={loc.name} value={loc.name}>
                                 {loc.name}
-                                {loc.type !== "City" && ` (${loc.type})`}
                               </option>
                             ))}
                           </select>

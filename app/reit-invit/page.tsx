@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,131 +24,64 @@ type ParsedReitInvit = {
   offices: OfficeContacts[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (
-        !line ||
-        line.startsWith("![") ||
-        line.startsWith("##") ||
-        line.startsWith("###") ||
-        line.startsWith("*")
-      ) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseReitInvit(markdown: string): ParsedReitInvit {
-  const lines = markdown.split(/\r?\n/);
-
-  const titleLine = lines.find((l) => l.trim().startsWith("# ")) ?? "# REIT & InvIT";
-  const title = normalizeText(titleLine.replace(/^#\s+/, ""));
-
-  const start = lines.findIndex((l) => l.trim() === titleLine.trim());
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  let intro = "";
-  for (const rawLine of content) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (line.startsWith("###")) break;
-    if (line.startsWith("*")) break;
-    intro = normalizeText(line);
-    break;
-  }
-
-  const services: string[] = [];
-  const servicesHeading = content.findIndex((l) => l.trim() === "### Services covered & offered for business trusts:");
-  if (servicesHeading >= 0) {
-    for (let i = servicesHeading + 1; i < content.length; i++) {
-      const line = content[i].trim();
-      if (line.startsWith("### ")) break;
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) services.push(normalizeText(bm[1]));
-    }
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoHeading = content.findIndex((l) => l.trim() === "### We Also Offer :");
-  if (alsoHeading >= 0) {
-    const officeStart = content.findIndex((l) => l.trim().match(/^###\s+.+Office$/i));
-    const slice = content.slice(alsoHeading + 1, officeStart > 0 ? officeStart : content.length);
-
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const m = line.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!m) continue;
-      if (m[2].includes("/reit-invit")) continue;
-      alsoOffer.push({ label: normalizeText(m[1]), href: m[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title,
-    intro,
-    services,
-    alsoOffer,
-    offices,
-  };
-}
+const parsed: ParsedReitInvit = {
+  title: "REIT & InvIT",
+  intro: "Real estate investment trusts (REITs) and Infrastructure investment trusts (InvITs) are the latest form of Investment Trusts under the local framework (India's very own framework for Business Trusts) that have been approved by SEBI. This offers a new asset class for investors as also a new source of financing to India's real estate and infrastructure industry.",
+  services: [
+    "Legal due diligence on assets and monitoring the flow of funds",
+    "Convening meetings of unit holders and maintenance of records",
+    "Investor relationship activity including review of unit holders complaints and their redressal",
+    "Regulatory compliance and reporting",
+    "Annual administration during the life of the trust",
+    "Structuring from legal and taxation perspective",
+    "Transfer of assets and listing assistance",
+    "Setting up of operational framework and common platform for participants including sponsor(/s), investor(/s), investment manager, principal valuer, project manager and stock exchange",
+    "Oversight of activities of the business trust under regulatory framework",
+  ],
+  alsoOffer: [
+    { label: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee", href: "https://beacontrustee.co.in/debenture-bond-trusteeship-listed" },
+    { label: "Alternative Investment Funds", href: "https://beacontrustee.co.in/alternative-investment-fund" },
+    { label: "Securitization: Securitized Debt Instruments (SDIs)", href: "https://beacontrustee.co.in/securitization-trustee-regulated" },
+    { label: "Escrow Services: Fractional Shares Escrow", href: "https://beacontrustee.co.in/escrow-fractional-regulated" },
+    { label: "Escrow Services: Investor Protection Fund Escrow", href: "https://beacontrustee.co.in/escrow-ipef-regulated" },
+    { label: "ESOP (For Listed Shares)", href: "https://beacontrustee.co.in/esop-regulated" },
+    { label: "Share Pledge Trustee (For Listed Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-regulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ],
+};
 
 function mapToInternalHref(url: string) {
   try {
@@ -192,11 +122,6 @@ function phaseForService(item: string): PhaseKey {
 }
 
 export default function ReitInvitPage() {
-  const mdPath = path.join(process.cwd(), "content", "reit-invit", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const parsed = parseReitInvit(md);
-
   const phases: Array<{ key: PhaseKey; number: string; title: string; items: string[] }> = [
     {
       key: "setup",

@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -15,21 +12,6 @@ type DocItem = {
   category: string;
 };
 
-function normalizeLabel(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function fileKindFromUrl(url: string) {
-  const clean = url.split("?")[0].split("#")[0];
-  const match = clean.match(/\.([a-z0-9]+)$/i);
-  if (!match) return "LINK";
-  return match[1].toUpperCase();
-}
-
 function slugify(input: string) {
   return input
     .toLowerCase()
@@ -37,66 +19,40 @@ function slugify(input: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function extractHeroDescription(markdown: string) {
-  const line = markdown
-    .split(/\r?\n/)
-    .find((l) => l.trim().startsWith("# This page is for dissemination"));
+const heroDescription = "This page is for dissemination of information to investors of securities and other products - wherein Beacon Trusteeship Limited, is appointed as the Trustee or in any other fiduciary capacity, alongside other external stakeholders and regulatory body.";
 
-  if (!line) return "";
-  return normalizeLabel(line.replace(/^#+\s+/, ""));
-}
-
-function parseDisclosure(markdown: string): DocItem[] {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim().startsWith("# This page is for dissemination"));
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-  const slice = lines.slice(start >= 0 ? start : 0, end > 0 ? end : lines.length);
-
-  let currentCategory = "Disclosures";
-  const docs: DocItem[] = [];
-
-  for (let i = 0; i < slice.length; i++) {
-    const line = slice[i].trim();
-
-    const headingMatch = line.match(/^##\s+(.+)/);
-    if (headingMatch) {
-      currentCategory = normalizeLabel(headingMatch[1]);
-      continue;
-    }
-
-    const downloadMatch = line.match(/^\[Download Now\]\((https?:\/\/[^)]+)\)/i);
-    if (!downloadMatch) continue;
-
-    const url = downloadMatch[1];
-
-    let j = i - 1;
-    while (j >= 0 && slice[j].trim() === "") j--;
-    const rawLabel = j >= 0 ? slice[j].trim() : currentCategory;
-
-    // If the "label" is actually another Download button (happens when the site has headings
-    // that don't render into the markdown export cleanly), fall back to the section title.
-    const maybeLabel = normalizeLabel(rawLabel.replace(/^#+\s+/, ""));
-    const label = maybeLabel.toLowerCase() === "download now" ? currentCategory : maybeLabel;
-
-    docs.push({
-      label: label || currentCategory,
-      url,
-      category: currentCategory,
-      kind: fileKindFromUrl(url),
-    });
-  }
-
-  const seen = new Set<string>();
-  const deduped: DocItem[] = [];
-  for (const doc of docs) {
-    if (seen.has(doc.url)) continue;
-    seen.add(doc.url);
-    deduped.push(doc);
-  }
-
-  return deduped;
-}
+const docs: DocItem[] = [
+  { label: "Investor Charter", url: "https://beacontrustee.co.in/wp-content/uploads/2024/07/InvestorCharter_20240527.pdf", kind: "PDF", category: "Investor Charter" },
+  { label: "December FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2026/01/9040_20260106163919_investor_grievance_report_december_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "November FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/12/7904_20251204170321_investor_grievance_report_november_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "October FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/11/8416_20251106190102_investor_grievance_report_october_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "September FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/10/1127_20251003180342_investor_grievance_report_september_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "August FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/09/5758_20250904162632_investor_grievance_report_august_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "July FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/08/9008_20250805164747_investor_grievance_report_july_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "June FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/07/5973_20250703171557_investor_grievance_report_june_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "May FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/5408_20250606152740_investor_grievance_report_may_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "April FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/05/7756_20250506173815_investor_grievance_report_april_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "March FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/04/4566_20250404152110_investor_grievance_report_march_2025.pdf", kind: "PDF", category: "Complaint Data" },
+  { label: "FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2026/01/3859_20260116173537_table_01_20260116_01.pdf", kind: "PDF", category: "Revision in Credit ratings" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/04/3739_20250404153015_table_01_20250331_94.pdf", kind: "PDF", category: "Revision in Credit ratings" },
+  { label: "FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2026/01/7030_20260116182032_tab02_fy2026_20260116_01.pdf", kind: "PDF", category: "Status of payment of interest/principal by the listed entity" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/9529_20250605183047_tab02_fy2025_20250605_01.pdf", kind: "PDF", category: "Status of payment of interest/principal by the listed entity" },
+  { label: "Q2 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/12/5302_20251214220338_tab03_202509_a.pdf", kind: "PDF", category: "Monitoring of Utilization Certificate, Asset cover certificate and Quarterly compliance report of the listed entity" },
+  { label: "Q1 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/09/3684_20250913234602_tab03_20250913_a.pdf", kind: "PDF", category: "Monitoring of Utilization Certificate, Asset cover certificate and Quarterly compliance report of the listed entity" },
+  { label: "Q4 FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/4229_20250630181837_tab03_d.pdf", kind: "PDF", category: "Monitoring of Utilization Certificate, Asset cover certificate and Quarterly compliance report of the listed entity" },
+  { label: "H1 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/12/7261_20251214222618_tab04_202509_a.pdf", kind: "PDF", category: "Details of Debenture issues handled by debenture trustee and their status" },
+  { label: "H2 FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/7814_20250620180108_tab04_a.pdf", kind: "PDF", category: "Details of Debenture issues handled by debenture trustee and their status" },
+  { label: "Q2 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/12/2021_20251214220437_tab05_202509_a.pdf", kind: "PDF", category: "Status of information regarding breach of covenants/terms of the issue, if any action taken by debenture trustee" },
+  { label: "Q1 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/09/2248_20250913234650_tab05_20250913_a.pdf", kind: "PDF", category: "Status of information regarding breach of covenants/terms of the issue, if any action taken by debenture trustee" },
+  { label: "Q4 FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/5095_20250620174011_tab05_a.pdf", kind: "PDF", category: "Status of information regarding breach of covenants/terms of the issue, if any action taken by debenture trustee" },
+  { label: "H1 FY 2025 - 2026", url: "https://beacontrustee.co.in/wp-content/uploads/2025/12/7220_20251214222805_tab06_202509_a.pdf", kind: "PDF", category: "Complaints received by debenture trustee(s) including default cases" },
+  { label: "H2 FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/4560_20250616131539_tab06_a.pdf", kind: "PDF", category: "Complaints received by debenture trustee(s) including default cases" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/5452_20250630165949_tab07a_b.pdf", kind: "PDF", category: "Debenture Redemption Reserve/Debenture Redemption/ maintenance of funds as per Companies (Share Capital and Debentures) Rules, 2014" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/6216_20250616114841_tab07b_a.pdf", kind: "PDF", category: "Recovery expense fund" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/6336_20251027173805_tab07c_b.pdf", kind: "PDF", category: "Accounts/ funds to be maintained in case of Municipal Debt Securities" },
+  { label: "FY 2024 - 2025", url: "https://beacontrustee.co.in/wp-content/uploads/2025/06/2238_20250616121830_tab08_a.pdf", kind: "PDF", category: "Status of information regarding any default by listed entity and action taken by debenture trustee" },
+  { label: "Data for failed Listed Debenture Payments", url: "https://beacontrustee.co.in/failed_debenture", kind: "LINK", category: "Press Release" },
+];
 
 function groupByCategory(docs: DocItem[]) {
   const map = new Map<string, DocItem[]>();
@@ -142,11 +98,6 @@ function DocRow({ index, doc }: { index: number; doc: DocItem }) {
 }
 
 export default function DisclosurePage() {
-  const mdPath = path.join(process.cwd(), "content", "disclosure", "index.md");
-  const disclosureMd = fs.readFileSync(mdPath, "utf8");
-
-  const heroDescription = extractHeroDescription(disclosureMd);
-  const docs = parseDisclosure(disclosureMd);
   const grouped = groupByCategory(docs);
   const categories = Array.from(grouped.keys());
 
@@ -200,8 +151,7 @@ export default function DisclosurePage() {
                 data-aos-delay={200}
                 className="mt-6 max-w-2xl text-lg leading-relaxed text-primary-navy/60"
               >
-                {heroDescription ||
-                  "This page is for dissemination of information to investors and stakeholders."}
+                {heroDescription}
               </p>
 
               <div

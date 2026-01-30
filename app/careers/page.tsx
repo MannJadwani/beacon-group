@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import { Suspense } from "react";
 
 import Link from "next/link";
@@ -16,95 +13,42 @@ type Job = {
   href: string;
 };
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
+const jobs: Job[] = [
+  {
+    title: "Legal",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/position_legal",
+  },
+  {
+    title: "Compliance",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/position_compliance",
+  },
+  {
+    title: "Associate - Operations",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/position_operation",
+  },
+  {
+    title: "Company Secretary",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/company_secretary",
+  },
+  {
+    title: "Graphic Designer",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/graphic_design",
+  },
+  {
+    title: "Digital Marketing Executive",
+    location: "Bandra East, Mumbai.",
+    href: "https://beacontrustee.co.in/digital_marketing",
+  },
+];
 
-function absolutizeBeaconPath(url: string) {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `https://beacontrustee.co.in${url}`;
-  return `https://beacontrustee.co.in/${url}`;
-}
-
-function decodeCloudflareEmail(hex: string) {
-  const clean = hex.trim();
-  if (!/^[0-9a-fA-F]+$/.test(clean)) return "";
-  if (clean.length < 4 || clean.length % 2 !== 0) return "";
-
-  const key = parseInt(clean.slice(0, 2), 16);
-  if (!Number.isFinite(key)) return "";
-
-  let out = "";
-  for (let i = 2; i < clean.length; i += 2) {
-    const byte = parseInt(clean.slice(i, i + 2), 16);
-    if (!Number.isFinite(byte)) return "";
-    out += String.fromCharCode(byte ^ key);
-  }
-  return out;
-}
-
-function parseJobs(markdown: string): Job[] {
-  const lines = markdown.split(/\r?\n/);
-  const start = lines.findIndex((l) => l.trim() === "#### Job Openings");
-  const end = lines.findIndex((l, i) => i > start && l.trim() === "#### Apply Now");
-  const slice = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-
-  const jobs: Job[] = [];
-  for (let i = 0; i < slice.length; i++) {
-    const line = slice[i].trim();
-    const m = line.match(/^######\s+\[([^\]]+)\]\(([^)]+)\)/);
-    if (!m) continue;
-
-    const title = normalizeText(m[1]);
-    const href = absolutizeBeaconPath(m[2]);
-
-    // Location is usually the next non-empty line that isn't a link.
-    let location = "";
-    for (let j = i + 1; j < slice.length; j++) {
-      const candidate = slice[j].trim();
-      if (!candidate) continue;
-      if (candidate.startsWith("[")) continue;
-      if (candidate.startsWith("####")) break;
-      location = normalizeText(candidate);
-      break;
-    }
-
-    jobs.push({ title, href, location });
-  }
-
-  // De-dupe by title.
-  const seen = new Set<string>();
-  return jobs.filter((j) => {
-    const key = j.title.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function parseResumeEmail(markdown: string) {
-  const lines = markdown.split(/\r?\n/);
-  const anchor = lines.findIndex((l) => l.toLowerCase().includes("to submit your resume"));
-
-  // Search nearby first, then fall back to the whole doc.
-  const searchSpace =
-    anchor >= 0
-      ? lines.slice(anchor, Math.min(lines.length, anchor + 12)).join("\n")
-      : markdown;
-
-  const match = searchSpace.match(/\/cdn-cgi\/l\/email-protection#([0-9a-fA-F]+)\b/);
-  if (!match) return "";
-  return decodeCloudflareEmail(match[1]);
-}
+const resumeEmail = "careers@beacontrustee.co.in";
 
 export default function CareersPage() {
-  const mdPath = path.join(process.cwd(), "content", "careers", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const jobs = parseJobs(md);
-  const resumeEmail = parseResumeEmail(md) || "contact@beacontrustee.co.in";
-
   const nav = [
     { id: "openings", label: "Openings" },
     { id: "apply", label: "Apply" },
@@ -188,7 +132,7 @@ export default function CareersPage() {
                       </p>
                       <p className="mt-3 text-base font-semibold text-primary-navy break-words">{resumeEmail}</p>
                       <p className="mt-2 text-xs text-primary-navy/50">
-                        We decode Cloudflare-protected email links from the source.
+                        Submit your resume to this email address.
                       </p>
                     </div>
                   </div>
@@ -234,7 +178,7 @@ export default function CareersPage() {
                       Tip
                     </p>
                     <p className="mt-3 text-sm leading-relaxed text-primary-navy/60">
-                      Want to apply for a role quickly? Use the “Apply” button on an opening to prefill
+                      Want to apply for a role quickly? Use the "Apply" button on an opening to prefill
                       the form.
                     </p>
                   </div>

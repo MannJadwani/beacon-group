@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,137 +13,72 @@ type ServiceItem = {
   href: string;
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function parseOuterMarkdownLink(line: string) {
-  const outer = line.match(/\)\]\((https?:\/\/[^)]+)\)\s*$/i);
-  if (outer) return outer[1];
-
-  const fallback = line.match(/\((https?:\/\/[^)]+)\)\s*$/i);
-  return fallback?.[1] ?? "";
-}
-
-function parseUnregulated(markdown: string): {
-  intro: string;
-  disclaimer: string;
-  services: ServiceItem[];
-  whyBullets: string[];
-  whyImage: string;
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const servicesStart = lines.findIndex((l) => l.trim() === "## Unregulated Services");
-  const whyStart = lines.findIndex((l) => l.trim() === "## Why Do Business With Beacon?");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const slice = lines.slice(
-    servicesStart >= 0 ? servicesStart + 1 : 0,
-    whyStart > 0 ? whyStart : lines.length,
-  );
-
-  const introLines: string[] = [];
-  let disclaimer = "";
-
-  let i = 0;
-  for (; i < slice.length; i++) {
-    const line = slice[i].trim();
-    if (!line) continue;
-
-    if (line.startsWith("![") || line.startsWith("### ")) break;
-
-    if (line.startsWith("*") && line.endsWith("*")) {
-      disclaimer = normalizeText(line.replaceAll("*", ""));
-      continue;
-    }
-
-    introLines.push(normalizeText(line));
-  }
-
-  const rawServices: Array<{ title: string; description: string; href: string }> = [];
-  let current: { title: string; description: string; href: string } | null = null;
-
-  for (; i < slice.length; i++) {
-    const line = slice[i].trim();
-
-    const heading = line.match(/^###\s+(.+)/);
-    if (heading) {
-      if (current) rawServices.push(current);
-      current = { title: normalizeText(heading[1]), description: "", href: "" };
-      continue;
-    }
-
-    if (!current) continue;
-
-    if (line.toLowerCase().startsWith("[read more")) {
-      current.href = parseOuterMarkdownLink(line);
-      continue;
-    }
-
-    if (!line) continue;
-    if (line.startsWith("![")) continue;
-    if (line.startsWith("## ")) continue;
-
-    current.description = normalizeText(`${current.description} ${line}`.trim());
-  }
-
-  if (current) rawServices.push(current);
-
-  const services: ServiceItem[] = rawServices.map((s, idx) => {
-    const number = String(idx + 1).padStart(2, "0");
-    const id = `service-${slugify(s.title)}`;
-    return {
-      id,
-      number,
-      title: s.title,
-      description: s.description,
-      href: s.href || "https://beacontrustee.co.in/unregulated-services",
-    };
-  });
-
-  const whySlice = lines.slice(
-    whyStart >= 0 ? whyStart + 1 : 0,
-    end > 0 ? end : lines.length,
-  );
-
-  const whyBullets: string[] = [];
-  let whyImage = "";
-
-  for (const raw of whySlice) {
-    const line = raw.trim();
-    const bullet = line.match(/^\*\s+###\s+(.+)/);
-    if (bullet) whyBullets.push(normalizeText(bullet[1]));
-
-    const img = line.match(/^!\[[^\]]+\]\((https?:\/\/[^)]+)\)/);
-    if (img) whyImage = img[1];
-  }
-
-  return {
-    intro: introLines.join(" "),
-    disclaimer,
-    services,
-    whyBullets,
-    whyImage,
-  };
-}
+const unregulatedData = {
+  intro: "Value addition beyond conventional trusteeship is one of our greatest differentiators. We take pride in ensuring that our one-stop solution motto backed by a wide range of Trustee Services is the answer to your needs.",
+  disclaimer: "These services are not regulated by SEBI or any other Financial Sector Regulators. They are separate and distinct from SEBI Regulated Services. None of the SEBI investor protection mechanism will be available for any grievances arising out of or pertaining to such activities.",
+  services: [
+    {
+      id: "service-family-trust",
+      number: "01",
+      title: "Family Office / Family Trust",
+      description: "A family trust is a legal arrangement where assets are transferred to a trust for the benefit of family members to be managed by a Trustee.",
+      href: "https://beacontrustee.co.in/family-trust",
+    },
+    {
+      id: "service-escrow-agent",
+      number: "02",
+      title: "Escrow Agent /Source Code Escrow /M&A /Settlement Escrow",
+      description: "Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc.",
+      href: "https://beacontrustee.co.in/escrow-monitoring-agency",
+    },
+    {
+      id: "service-security-trustee",
+      number: "03",
+      title: "Security Trustee",
+      description: "As a Security Trustee, Beacon Trusteeship acts as a non-partisan fiduciary person, holding in good faith & trust...",
+      href: "https://beacontrustee.co.in/security-trustee-services",
+    },
+    {
+      id: "service-facility-agent",
+      number: "04",
+      title: "Facility Agent",
+      description: "As a Facility Agent, Beacon Trusteeship acts as a single point of contact between the Borrower & the Lender(s)...",
+      href: "https://beacontrustee.co.in/facility-agent",
+    },
+    {
+      id: "service-esop",
+      number: "05",
+      title: "ESOP / EWT / EBT (For Unlisted Shares)",
+      description: "Trustee for the plan / scheme offered in respect of unlisted shares.",
+      href: "https://beacontrustee.co.in/esop-unregulated",
+    },
+    {
+      id: "service-safe-keeping",
+      number: "06",
+      title: "Safe Keeping Agent",
+      description: "Safe keeping services are one of the additional services we provide at Beacon. Clients can safely keep their valuable...",
+      href: "https://beacontrustee.co.in/safe-keeping-agent",
+    },
+    {
+      id: "service-share-pledge",
+      number: "07",
+      title: "Share Pledge Trustee (For Unlisted Shares)",
+      description: "One of the common transactions we come across in today's market is Loan against Shares. In this kind of a product a lender...",
+      href: "https://beacontrustee.co.in/share-pledge-trustee-unregulated",
+    },
+  ] as ServiceItem[],
+  whyBullets: [
+    "Quality, Excellence & Trustworthiness",
+    "Client Centric Solutions",
+    "Absolute Confidentiality",
+    "Industry Experience",
+    "Value Added Services",
+  ],
+  whyImage: "https://beacontrustee.co.in/assets/images/why-choose.png",
+};
 
 export default function UnregulatedServicesPage() {
-  const mdPath = path.join(process.cwd(), "content", "unregulated-services", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { intro, disclaimer, services, whyBullets, whyImage } = parseUnregulated(md);
+  const { intro, disclaimer, services, whyBullets, whyImage } = unregulatedData;
 
   return (
     <main id="top" className="min-h-screen bg-white text-primary-navy">

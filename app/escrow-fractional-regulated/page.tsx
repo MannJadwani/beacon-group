@@ -1,30 +1,9 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
 import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
-
-const SERVICE_LINK_MAP: Record<string, string> = {
-  "https://beacontrustee.co.in/services": "/services",
-  "https://beacontrustee.co.in/debenture-bond-trusteeship-listed": "/debenture-bond-trusteeship",
-  "https://beacontrustee.co.in/alternative-investment-fund": "/alternative-investment-fund",
-  "https://beacontrustee.co.in/securitization-trustee-regulated": "/securitization-trustee",
-  "https://beacontrustee.co.in/reit-invit": "/reit-invit",
-  "https://beacontrustee.co.in/escrow-fractional-regulated": "/escrow-fractional-regulated",
-  "https://beacontrustee.co.in/escrow-ipef-regulated": "/escrow-ipef-regulated",
-  "https://beacontrustee.co.in/esop-regulated": "/esop-regulated",
-  "https://beacontrustee.co.in/share-pledge-trustee-regulated": "/share-pledge-trustee-regulated",
-};
-
-function mapServiceHref(href: string) {
-  if (!href) return href;
-  const clean = href.replace(/\/$/, "");
-  return SERVICE_LINK_MAP[clean] ?? href;
-}
 
 type SplitBullets = {
   id: string;
@@ -43,168 +22,82 @@ type OfficeContacts = {
   people: ContactPerson[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (!line || line.startsWith("![") || line.startsWith("##") || line.startsWith("###") || line.startsWith("*")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
+// Hardcoded data for Escrow Fractional page
+const ESCROW_DATA = {
+  title: "Escrow Services",
+  intro: "Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc., on behalf of two or more transacting parties. The appointment & scope of work of an Escrow Agent is broadly described in an Escrow Agreement executed by & amongst the Escrow Agent & the transacting parties. An Escrow Agent plays a crucial role in:",
+  coverage: [
+    "Timely Debt Servicing",
+    "Business Acquisition",
+    "Private Equity Transactions",
+    "Retention of Securities",
+    "Disputed Liabilities",
+    "P2P Platforms",
+    "Online Gaming & Shopping Platforms",
+    "E-Commerce transactions",
+    "International Trade & Export Finance",
+    "Loan Against Securities"
+  ],
+  sections: [
+    {
+      id: "services",
+      title: "As an Escrow Agent, Beacon Trusteeship offers the following services",
+      bullets: [
+        "Drafting & Vetting of Escrow Agreement",
+        "Set up of Escrow Mechanism envisaging future cash flows & waterfall disbursement.",
+        "Adept documentation & synergizing of Escrow Mechanism with terms of sanctioned facilities.",
+        "Expeditious opening & management of:",
+        "Escrow Current Account with Banks for retention of funds",
+        "Escrow Demat Account with Depositories for retention of securities",
+        "Ensuring smooth flow of funds to & fro Escrow Account",
+        "Meticulous adherence to extant covenants, provisions & T&Cs of the Escrow Agreement",
+        "Monitoring of Fund Movement",
+        "Ensuring maintenance of Debt Service Reserve Amount (DSRA)",
+        "Periodic/Daily valuation & monitoring of securities.",
+        "Release of assets post assurance due diligence & compliance of extant terms."
+      ]
     }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
+  ] as SplitBullets[],
+  alsoOffer: [
+    { label: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee", href: "/debenture-bond-trusteeship" },
+    { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
+    { label: "Securitization: Securitized Debt Instruments (SDIs)", href: "/securitization-trustee" },
+    { label: "REIT & InvIT", href: "/reit-invit" },
+    { label: "Escrow Services: Fractional Shares Escrow", href: "/escrow-fractional-regulated" },
+    { label: "Escrow Services: Investor Protection Fund Escrow", href: "/escrow-ipef-regulated" },
+    { label: "ESOP (For Listed Shares)", href: "/esop-regulated" },
+    { label: "Share Pledge Trustee (For Listed Shares)", href: "/share-pledge-trustee-regulated" }
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" }
+      ]
+    },
+    {
+      office: "Delhi Office",
+      people: [{ name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" }]
+    },
+    {
+      office: "Hyderabad Office",
+      people: [{ name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" }]
+    },
+    {
+      office: "Bangalore Office",
+      people: [{ name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" }]
+    },
+    {
+      office: "Chennai Office",
+      people: [{ name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" }]
     }
-  }
-
-  return offices;
-}
-
-function parseEscrowFractional(markdown: string): {
-  title: string;
-  intro: string;
-  coverage: string[];
-  sections: SplitBullets[];
-  alsoOffer: Array<{ label: string; href: string }>;
-  offices: OfficeContacts[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Escrow Services: Fractional Shares Escrow");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  const introLines: string[] = [];
-  const coverage: string[] = [];
-  let i = 0;
-  for (; i < content.length; i++) {
-    const line = content[i].trim();
-    if (!line) continue;
-    if (line.startsWith("### ")) break;
-    if (line.startsWith("![")) continue;
-
-    const bullet = line.match(/^\*\s+(.+)/);
-    if (bullet) {
-      coverage.push(normalizeText(bullet[1]));
-      continue;
-    }
-
-    introLines.push(normalizeText(line));
-  }
-
-  const headings: Array<{ title: string; index: number }> = [];
-  for (let j = 0; j < content.length; j++) {
-    const m = content[j].trim().match(/^###\s+(.+)/);
-    if (m) headings.push({ title: normalizeText(m[1]), index: j });
-  }
-
-  const sections: SplitBullets[] = [];
-  for (let j = 0; j < headings.length; j++) {
-    const h = headings[j];
-    const next = headings[j + 1];
-    const slice = content.slice(h.index + 1, next ? next.index : content.length);
-
-    if (h.title.toLowerCase().startsWith("we also offer")) continue;
-    if (h.title.toLowerCase().includes("office")) continue;
-
-    const bullets: string[] = [];
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) bullets.push(normalizeText(bm[1]));
-    }
-
-    if (bullets.length === 0) continue;
-
-    sections.push({
-      id: slugify(h.title),
-      title: h.title,
-      bullets,
-    });
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = content.findIndex((l) => l.trim().toLowerCase().startsWith("### we also offer"));
-  if (alsoStart >= 0) {
-    const alsoSlice = content.slice(alsoStart + 1);
-    for (const rawLine of alsoSlice) {
-      const line = rawLine.trim();
-      const lm = line.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-      alsoOffer.push({ label: normalizeText(lm[1]), href: lm[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title: "Escrow Services",
-    intro: introLines.join(" "),
-    coverage,
-    sections,
-    alsoOffer,
-    offices,
-  };
-}
+  ] as OfficeContacts[]
+};
 
 export default function EscrowFractionalRegulatedPage() {
-  const mdPath = path.join(process.cwd(), "content", "escrow-fractional-regulated", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { title, intro, coverage, sections, alsoOffer, offices } = parseEscrowFractional(md);
+  const { title, intro, coverage, sections, alsoOffer, offices } = ESCROW_DATA;
 
   const nav = [
     { id: "overview", label: "Overview" },
@@ -519,7 +412,7 @@ export default function EscrowFractionalRegulatedPage() {
 
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2" data-aos="fade-up" data-aos-delay={150}>
               {alsoOffer.slice(0, 6).map((link) => {
-                const href = mapServiceHref(link.href);
+                const href = link.href;
                 const isExternal = href.startsWith("http");
 
                 return (

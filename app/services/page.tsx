@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,55 +6,6 @@ import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
 
 import type { ServiceAtlasItem } from "./ServicesAtlas";
-
-type ParsedService = {
-  title: string;
-  description: string;
-  href: string;
-};
-
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function parseOuterMarkdownLink(line: string) {
-  // Handles patterns like:
-  // [Read more ![Read More](...)](https://example.com/path)
-  const outer = line.match(/\)\]\((https?:\/\/[^)]+)\)\s*$/i);
-  if (outer) return outer[1];
-
-  const fallback = line.match(/\((https?:\/\/[^)]+)\)\s*$/i);
-  return fallback?.[1] ?? "";
-}
-
-const SERVICE_LINK_MAP: Record<string, string> = {
-  "https://beacontrustee.co.in/services": "/services",
-  "https://beacontrustee.co.in/debenture-bond-trusteeship-listed": "/debenture-bond-trusteeship",
-  "https://beacontrustee.co.in/alternative-investment-fund": "/alternative-investment-fund",
-  "https://beacontrustee.co.in/securitization-trustee-regulated": "/securitization-trustee",
-  "https://beacontrustee.co.in/reit-invit": "/reit-invit",
-  "https://beacontrustee.co.in/escrow-fractional-regulated": "/escrow-fractional-regulated",
-  "https://beacontrustee.co.in/escrow-ipef-regulated": "/escrow-ipef-regulated",
-  "https://beacontrustee.co.in/esop-regulated": "/esop-regulated",
-  "https://beacontrustee.co.in/share-pledge-trustee-regulated": "/share-pledge-trustee-regulated",
-};
-
-function mapServiceHref(href: string) {
-  if (!href) return "/services";
-  const clean = href.replace(/\/$/, "");
-  return SERVICE_LINK_MAP[clean] ?? href;
-}
 
 function shortTitle(title: string) {
   const t = title.toLowerCase();
@@ -178,120 +126,102 @@ function tagsForService(title: string): string[] {
   return ["TRUSTEE", "SERVICE"]; 
 }
 
-function parseServicesPage(markdown: string): {
-  intro: string;
-  note: string;
-  services: ServiceAtlasItem[];
-  whyBullets: string[];
-  whyImage: string;
-} {
-  const lines = markdown.split(/\r?\n/);
+const SERVICES_DATA: ServiceAtlasItem[] = [
+  {
+    id: "service-listed-ncd-bond",
+    number: "01",
+    title: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee",
+    shortTitle: "Listed NCD / Bond",
+    description: "As a Debenture Trustee, Beacon Trusteeship plays a pivotal role in protecting the interests of debenture holders/bondholders by ensuring compliance with SEBI regulations and monitoring the issuer's obligations throughout the bond lifecycle.",
+    href: "/debenture-bond-trusteeship",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-1.jpg",
+    tags: ["LISTED", "DEBT", "TRUSTEE", "MUNICIPAL"],
+  },
+  {
+    id: "service-aif",
+    number: "02",
+    title: "Alternative Investment Funds",
+    shortTitle: "AIF",
+    description: "An Alternative Investment Funds (AIF) is a privately pooled investment vehicle – set up as Trust, Company, or LLP – that invests in assets beyond traditional securities, providing sophisticated investors with diversified portfolio options.",
+    href: "/alternative-investment-fund",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-3.jpg",
+    tags: ["AIF", "FUNDS", "GOVERNANCE"],
+  },
+  {
+    id: "service-securitization-sdi",
+    number: "03",
+    title: "Securitization: Securitized Debt Instruments (SDIs)",
+    shortTitle: "Securitization (SDI)",
+    description: "Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy-remote structure enabling efficient capital deployment and risk distribution.",
+    href: "/securitization-trustee",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-4.jpg",
+    tags: ["SECURITIZATION", "SDI", "TRUSTEE"],
+  },
+  {
+    id: "service-reit-invit",
+    number: "04",
+    title: "REIT & InvIT",
+    shortTitle: "REIT & InvIT",
+    description: "Real estate investment trusts (REITs) and Infrastructure investment trusts (InvITs) are the latest form of Investment Trusts that provide investors with a unique opportunity to participate in income-generating real estate and infrastructure assets.",
+    href: "/reit-invit",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-2.jpg",
+    tags: ["REIT", "INVIT", "TRUSTEE"],
+  },
+  {
+    id: "service-escrow-fractional",
+    number: "05",
+    title: "Escrow Services: Fractional Shares Escrow",
+    shortTitle: "Escrow (Fractional)",
+    description: "Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc. – for the purpose of a transaction between two parties, ensuring safe and transparent settlement processes.",
+    href: "/escrow-fractional-regulated",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-5.jpg",
+    tags: ["ESCROW", "FRACTIONAL", "SHARES"],
+  },
+  {
+    id: "service-escrow-investor-protection",
+    number: "06",
+    title: "Escrow Services: Investor Protection Fund Escrow",
+    shortTitle: "Escrow (Investor Protection)",
+    description: "Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc. – for the purpose of a transaction between two parties, with specialized focus on investor protection mechanisms.",
+    href: "/escrow-ipef-regulated",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-5.jpg",
+    tags: ["ESCROW", "INVESTOR", "PROTECTION"],
+  },
+  {
+    id: "service-esop",
+    number: "07",
+    title: "ESOP (For Listed Shares)",
+    shortTitle: "ESOP",
+    description: "Trustee for ESOP - Employee Stock Options Plan, EWT - Employee Welfare Trust, EBT – Employee Benefit Trust, providing comprehensive governance for employee share-based benefit schemes with full regulatory compliance.",
+    href: "/esop-regulated",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-6.jpg",
+    tags: ["ESOP", "EWT", "TRUSTEE"],
+  },
+  {
+    id: "service-share-pledge",
+    number: "08",
+    title: "Share Pledge Trustee (For Listed Shares)",
+    shortTitle: "Share Pledge",
+    description: "One of the common transactions we come across in today's market is Loan against Shares. In this kind of a product a lender provides loans secured by pledge of listed securities, requiring independent trustee oversight.",
+    href: "/share-pledge-trustee-regulated",
+    imageSrc: "https://beacontrustee.co.in/assets/images/banners/head-banner-2.jpg",
+    tags: ["PLEDGE", "SHARES", "TRUSTEE"],
+  },
+];
 
-  const servicesStart = lines.findIndex((l) => l.trim() === "## SEBI Regulated Services");
-  const whyStart = lines.findIndex((l) => l.trim() === "## Why Do Business With Beacon?");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
+const WHY_BULLETS = [
+  "Quality, Excellence & Trustworthiness",
+  "Client Centric Solutions",
+  "Absolute Confidentiality",
+  "Industry Experience",
+  "Value Added Services",
+];
 
-  const serviceSlice = lines.slice(
-    servicesStart >= 0 ? servicesStart + 1 : 0,
-    whyStart > 0 ? whyStart : lines.length,
-  );
-
-  const introLines: string[] = [];
-  let note = "";
-
-  let i = 0;
-  for (; i < serviceSlice.length; i++) {
-    const line = serviceSlice[i].trim();
-
-    if (!line) continue;
-    if (line.startsWith("![")) break;
-    if (line.startsWith("### ")) break;
-
-    if (line.startsWith("*") && line.endsWith("*")) {
-      note = normalizeText(line.replaceAll("*", ""));
-      continue;
-    }
-
-    introLines.push(normalizeText(line));
-  }
-
-  const parsedServices: ParsedService[] = [];
-  let current: ParsedService | null = null;
-
-  for (; i < serviceSlice.length; i++) {
-    const line = serviceSlice[i].trim();
-
-    const heading = line.match(/^###\s+(.+)/);
-    if (heading) {
-      if (current) parsedServices.push(current);
-      current = { title: normalizeText(heading[1]), description: "", href: "" };
-      continue;
-    }
-
-    if (!current) continue;
-
-    if (line.toLowerCase().startsWith("[read more")) {
-      current.href = parseOuterMarkdownLink(line);
-      continue;
-    }
-
-    if (!line) continue;
-    if (line.startsWith("![")) continue;
-    if (line.startsWith("## ")) continue;
-
-    current.description = normalizeText(`${current.description} ${line}`.trim());
-  }
-
-  if (current) parsedServices.push(current);
-
-  const services: ServiceAtlasItem[] = parsedServices.map((s, idx) => {
-    const number = String(idx + 1).padStart(2, "0");
-    const id = `service-${slugify(s.title)}`;
-
-    return {
-      id,
-      number,
-      title: s.title,
-      shortTitle: shortTitle(s.title),
-      description: s.description,
-      href: mapServiceHref(s.href),
-      imageSrc: imageForService(s.title, idx),
-      tags: tagsForService(s.title),
-    };
-  });
-
-  const whySlice = lines.slice(
-    whyStart >= 0 ? whyStart + 1 : 0,
-    end > 0 ? end : lines.length,
-  );
-
-  const whyBullets: string[] = [];
-  let whyImage = "";
-
-  for (const raw of whySlice) {
-    const line = raw.trim();
-
-    const bullet = line.match(/^\*\s+###\s+(.+)/);
-    if (bullet) whyBullets.push(normalizeText(bullet[1]));
-
-    const img = line.match(/^!\[[^\]]+\]\((https?:\/\/[^)]+)\)/);
-    if (img) whyImage = img[1];
-  }
-
-  return {
-    intro: introLines.join(" "),
-    note,
-    services,
-    whyBullets,
-    whyImage,
-  };
-}
+const WHY_IMAGE = "https://beacontrustee.co.in/assets/images/why-choose.png";
 
 export default function ServicesPage() {
-  const mdPath = path.join(process.cwd(), "content", "services", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { intro, note, services, whyBullets, whyImage } = parseServicesPage(md);
+  const intro = "Value addition beyond conventional trusteeship is one of our greatest differentiators. We take pride in ensuring that our one-stop solution motto backed by a wide range of Trustee Services is the answer to your needs.";
+  const note = "These are services regulated by SEBI.";
 
   return (
     <main id="top" className="min-h-screen bg-white text-primary-navy">
@@ -320,8 +250,7 @@ export default function ServicesPage() {
                 </h1>
 
                 <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">
-                  {intro ||
-                    "Value addition beyond conventional trusteeship is one of our greatest differentiators."}
+                  {intro}
                 </p>
 
                 {note && (
@@ -369,7 +298,7 @@ export default function ServicesPage() {
                         </p>
                         <p className="mt-2 text-lg font-semibold">SEBI regulated</p>
                         <p className="mt-2 text-sm text-white/70">
-                          {services.length} mandates in scope.
+                          {SERVICES_DATA.length} mandates in scope.
                         </p>
                       </div>
                       <span className="text-accent-gold">→</span>
@@ -442,7 +371,7 @@ export default function ServicesPage() {
 
           <div className="mt-10 bg-primary-navy/10 p-px" aria-hidden="true" data-aos="fade-up">
             <div className="grid grid-cols-2 gap-px sm:grid-cols-4 lg:grid-cols-8">
-              {services.map((s) => (
+              {SERVICES_DATA.map((s) => (
                 <div key={s.id} className="bg-white px-5 py-5">
                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/35">
                     {s.number}
@@ -475,7 +404,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" data-aos="fade-up" data-aos-delay={150}>
-            {services.map((service) => {
+            {SERVICES_DATA.map((service) => {
               const isExternal = service.href.startsWith("http");
 
               return (
@@ -559,16 +488,7 @@ export default function ServicesPage() {
             <div className="grid grid-cols-1 gap-px lg:grid-cols-12">
               <div className="bg-white p-10 lg:col-span-7 lg:p-12">
                 <div className="grid grid-cols-1 gap-px bg-primary-navy/10 sm:grid-cols-2">
-                  {(whyBullets.length > 0
-                    ? whyBullets
-                    : [
-                        "Quality, Excellence & Trustworthiness",
-                        "Client Centric Solutions",
-                        "Absolute Confidentiality",
-                        "Industry Experience",
-                        "Value Added Services",
-                      ]
-                  ).map((item, idx) => (
+                  {WHY_BULLETS.map((item, idx) => (
                     <div key={item} className="bg-white p-8">
                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
                         Proof {String(idx + 1).padStart(2, "0")}
@@ -599,7 +519,7 @@ export default function ServicesPage() {
 
               <div className="relative overflow-hidden bg-primary-navy lg:col-span-5">
                 <Image
-                  src={whyImage || "https://beacontrustee.co.in/assets/images/why-choose.png"}
+                  src={WHY_IMAGE}
                   alt="Why choose Beacon"
                   fill
                   className="object-cover opacity-70"

@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -28,150 +25,70 @@ type FacilityAgentContent = {
   offices: OfficeContacts[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (
-        !line ||
-        line.startsWith("![") ||
-        line.startsWith("##") ||
-        line.startsWith("###") ||
-        line.startsWith("*")
-      ) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseFacilityAgent(markdown: string): FacilityAgentContent {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Facility Agent");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  // Intro: first non-empty line after Submit.
-  let intro = "";
-  for (const rawLine of content) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (line.startsWith("###")) break;
-    if (line.startsWith("*")) break;
-    intro = normalizeText(line);
-    break;
-  }
-
-  const offer: string[] = [];
-  const benefits: string[] = [];
-
-  const offerHeading = content.findIndex((l) => l.trim() === "### As a Facility Agent, we offer");
-  const benefitsHeading = content.findIndex((l) => l.trim().startsWith("### Benefit to Borrowers"));
-  const alsoHeading = content.findIndex((l) => l.trim() === "### We Also Offer :");
-
-  if (offerHeading >= 0) {
-    const endIndex = benefitsHeading >= 0 ? benefitsHeading : alsoHeading >= 0 ? alsoHeading : content.length;
-    for (let i = offerHeading + 1; i < endIndex; i++) {
-      const line = content[i].trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) offer.push(normalizeText(bm[1]));
-    }
-  }
-
-  if (benefitsHeading >= 0) {
-    const endIndex = alsoHeading >= 0 ? alsoHeading : content.length;
-    for (let i = benefitsHeading + 1; i < endIndex; i++) {
-      const line = content[i].trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) benefits.push(normalizeText(bm[1]));
-    }
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  if (alsoHeading >= 0) {
-    // Stop at the first office section.
-    const officeStart = content.findIndex((l) => l.trim().match(/^###\s+.+Office$/i));
-    const slice = content.slice(alsoHeading + 1, officeStart > 0 ? officeStart : content.length);
-
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const linkMatch = line.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!linkMatch) continue;
-
-      const label = normalizeText(linkMatch[1]);
-      const href = linkMatch[2];
-
-      // Avoid self-link
-      if (href.includes("/facility-agent")) continue;
-
-      alsoOffer.push({ label, href });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title: "Facility Agent",
-    intro,
-    offer,
-    benefits,
-    alsoOffer,
-    offices,
-  };
-}
+const parsed: FacilityAgentContent = {
+  title: "Facility Agent",
+  intro: "As a Facility Agent, Beacon Trusteeship acts as a single point of contact between the Borrower & the Lender(s). As a Facility Agent, our priority is to ensure a smooth flow of funds & information between the transacting parties. Our valuable inputs & customer-centric solutions help our clients reap the optimum benefit of the financial facilities extended.",
+  offer: [
+    "Confirming to Pre & Post Disbursement Compliances",
+    "Monitoring of covenants as per terms of sanction",
+    "System generated Interest Payment & Principal Redemption Calculations",
+    "Periodic reminders for timely debt servicing",
+    "Fund movement monitoring",
+    "Periodic reminders for timely submission of Compliance Reports",
+    "360 degree outlook on operational & legal aspects of a given transaction",
+    "Expeditious opening & management of Bank Accounts",
+    "Transaction centric services",
+  ],
+  benefits: [
+    "Confirmation of Pre Disbursement compliances",
+    "Monitoring & dispensing information regarding Post Disbursement Compliances",
+    "Single point of contact for communication",
+    "Conduct meetings of the transacting parties",
+    "Bi-partisan outlook on operational & legal aspects",
+  ],
+  alsoOffer: [
+    { label: "Family Office / Family Trust", href: "https://beacontrustee.co.in/family-trust" },
+    { label: "Escrow Agent /Source Code Escrow /M&A /Settlement Escrow", href: "https://beacontrustee.co.in/escrow-monitoring-agency" },
+    { label: "Security Trustee", href: "https://beacontrustee.co.in/security-trustee-services" },
+    { label: "ESOP / EWT / EBT (For Unlisted Shares)", href: "https://beacontrustee.co.in/esop-unregulated" },
+    { label: "Safe Keeping Agent", href: "https://beacontrustee.co.in/safe-keeping-agent" },
+    { label: "Share Pledge Trustee (For Unlisted Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-unregulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ],
+};
 
 function mapRelatedHref(url: string) {
   try {
@@ -197,11 +114,6 @@ function classifyOffer(item: string): "Compliance" | "Cashflow" | "Operations" {
 }
 
 export default function FacilityAgentPage() {
-  const mdPath = path.join(process.cwd(), "content", "facility-agent", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const parsed = parseFacilityAgent(md);
-
   const compliance = parsed.offer.filter((o) => classifyOffer(o) === "Compliance");
   const cashflow = parsed.offer.filter((o) => classifyOffer(o) === "Cashflow");
   const ops = parsed.offer.filter((o) => classifyOffer(o) === "Operations");

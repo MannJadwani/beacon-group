@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -28,141 +25,81 @@ type ParsedEscrow = {
   offices: OfficeContacts[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (!line || line.startsWith("![") || line.startsWith("##") || line.startsWith("###") || line.startsWith("*")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseEscrow(markdown: string): ParsedEscrow {
-  const lines = markdown.split(/\r?\n/);
-
-  const titleLine = lines.find((l) => l.trim().startsWith("# ")) ?? "# Escrow";
-  const title = normalizeText(titleLine.replace(/^#\s+/, ""));
-
-  const start = lines.findIndex((l) => l.trim() === titleLine.trim());
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  let intro = "";
-  for (const rawLine of content) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (line.startsWith("*")) break;
-    if (line.startsWith("###")) break;
-    intro = normalizeText(line);
-    break;
-  }
-
-  const useCases: string[] = [];
-  for (const rawLine of content) {
-    const line = rawLine.trim();
-    const bm = line.match(/^\*\s+(.+)/);
-    if (!bm) continue;
-    if (normalizeText(bm[1]).toLowerCase().startsWith("drafting")) break;
-    useCases.push(normalizeText(bm[1]));
-  }
-
-  const services: string[] = [];
-  const servicesHeading = content.findIndex((l) => l.trim().startsWith("### As an Escrow Agent"));
-  if (servicesHeading >= 0) {
-    for (let i = servicesHeading + 1; i < content.length; i++) {
-      const line = content[i].trim();
-      if (line.startsWith("### ")) break;
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) {
-        const text = normalizeText(bm[1]);
-        if (text && text !== "\u2022") services.push(text);
-      }
-    }
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = content.findIndex((l) => l.trim() === "### We Also Offer :");
-  if (alsoStart >= 0) {
-    const alsoSlice = content.slice(alsoStart + 1);
-    for (const rawLine of alsoSlice) {
-      const line = rawLine.trim();
-      const lm = line.match(/^\*\s+\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-      alsoOffer.push({ label: normalizeText(lm[1]), href: lm[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title,
-    intro,
-    useCases,
-    services,
-    alsoOffer,
-    offices,
-  };
-}
+const escrowData: ParsedEscrow = {
+  title: "Escrow Agent / Source Code Escrow / M&A / Settlement Escrow",
+  intro: "Escrow Agent is an independent third party capable of holding assets – funds, securities, movables, etc., on behalf of two or more transacting parties. The appointment & scope of work of an Escrow Agent is broadly described in an Escrow Agreement executed by & amongst the Escrow Agent & the transacting parties.",
+  useCases: [
+    "Timely Debt Servicing",
+    "Business Acquisition",
+    "Private Equity Transactions",
+    "Retention of Securities",
+    "Disputed Liabilities",
+    "P2P Platforms",
+    "Online Gaming & Shopping Platforms",
+    "E-Commerce transactions",
+    "International Trade & Export Finance",
+    "Loan Against Securities",
+  ],
+  services: [
+    "Drafting & Vetting of Escrow Agreement",
+    "Set up of Escrow Mechanism envisaging future cash flows & waterfall disbursement",
+    "Adept documentation & synergizing of Escrow Mechanism with terms of sanctioned facilities",
+    "Expeditious opening & management of Escrow Current Account with Banks for retention of funds",
+    "Escrow Demat Account with Depositories for retention of securities",
+    "Ensuring smooth flow of funds to & fro Escrow Account",
+    "Meticulous adherence to extant covenants, provisions & T&Cs of the Escrow Agreement",
+    "Monitoring of Fund Movement",
+    "Ensuring maintenance of Debt Service Reserve Amount (DSRA)",
+    "Periodic/Daily valuation & monitoring of securities",
+    "Release of assets post assurance due diligence & compliance of extant terms",
+  ],
+  alsoOffer: [
+    { label: "Family Office / Family Trust", href: "https://beacontrustee.co.in/family-trust" },
+    { label: "Escrow Agent /Source Code Escrow /M&A /Settlement Escrow", href: "https://beacontrustee.co.in/escrow-monitoring-agency" },
+    { label: "Security Trustee", href: "https://beacontrustee.co.in/security-trustee-services" },
+    { label: "Facility Agent", href: "https://beacontrustee.co.in/facility-agent" },
+    { label: "ESOP / EWT / EBT (For Unlisted Shares)", href: "https://beacontrustee.co.in/esop-unregulated" },
+    { label: "Safe Keeping Agent", href: "https://beacontrustee.co.in/safe-keeping-agent" },
+    { label: "Share Pledge Trustee (For Unlisted Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-unregulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ],
+};
 
 export default function EscrowMonitoringAgencyPage() {
-  const mdPath = path.join(process.cwd(), "content", "escrow-monitoring-agency", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const parsed = parseEscrow(md);
+  const parsed = escrowData;
 
   const nav = [
     { id: "overview", label: "Overview" },
@@ -198,10 +135,10 @@ export default function EscrowMonitoringAgencyPage() {
                  {parsed.intro || "Independent holding mechanism for funds and assets between transacting parties."}
                </p>
                <div className="flex flex-col gap-2">
-                 <Link href="/contact" className="inline-flex items-center justify-between px-6 py-4 bg-primary-navy text-white hover:bg-accent-gold hover:text-primary-navy transition-colors group">
-                    <span className="text-xs font-bold tracking-[0.2em] uppercase">Initiate Setup</span>
-                    <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
-                 </Link>
+                  <Link href="/contact" className="inline-flex items-center justify-between px-6 py-4 bg-primary-navy text-white hover:bg-accent-gold hover:text-primary-navy transition-colors group">
+                     <span className="text-xs font-bold tracking-[0.2em] uppercase">Initiate Setup</span>
+                     <span className="text-xl group-hover:translate-x-1 transition-transform">→</span>
+                  </Link>
                </div>
             </div>
           </div>

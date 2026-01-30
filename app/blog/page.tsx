@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
@@ -13,109 +10,94 @@ type BlogPost = {
   imageSrc: string;
 };
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
+const categories = [
+  "All",
+  "Security Trustee",
+  "Debenture Trustee",
+  "AIF",
+  "Securitization",
+  "REITs",
+];
 
-function absolutizeBeaconPath(url: string) {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `https://beacontrustee.co.in${url}`;
-  return `https://beacontrustee.co.in/${url}`;
-}
-
-function parseBlog(markdown: string): {
-  categories: string[];
-  posts: BlogPost[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Welcome to our Blog");
-  const discover = lines.findIndex((l, i) => i > start && l.trim() === "## Discover Our Blogs");
-  const slice = lines.slice(start >= 0 ? start + 1 : 0, discover > 0 ? discover : lines.length);
-
-  const categories = slice
-    .map((l) => l.trim())
-    .filter((l) => l.startsWith("*") && !l.includes("[") && l.length > 2)
-    .map((l) => normalizeText(l.replace(/^\*\s+/, "")))
-    .filter(Boolean);
-
-  const topPostsIndex = lines.findIndex((l) => l.trim() === "#### Top Posts");
-  const endIndex = lines.findIndex((l, i) => i > topPostsIndex && l.trim().startsWith("#### Follow Us On"));
-
-  const posts: BlogPost[] = [];
-
-  if (topPostsIndex >= 0) {
-    for (let i = topPostsIndex + 1; i < (endIndex > 0 ? endIndex : lines.length); i++) {
-      const line = lines[i].trim();
-
-      // Pattern in export:
-      // [![Alt](image_url)
-      //
-      // ##### Title](href)
-      if (!line.startsWith("[![")) continue;
-
-      const altEnd = line.indexOf("](");
-      if (altEnd < 0) continue;
-
-      const alt = line.slice(3, altEnd);
-
-      const urlStart = altEnd + 2;
-      const urlEnd = line.lastIndexOf(")");
-      if (urlEnd < 0 || urlEnd <= urlStart) continue;
-      const imageSrc = absolutizeBeaconPath(line.slice(urlStart, urlEnd));
-
-      // Find the next non-empty line containing the link target.
-      let j = i + 1;
-      while (j < lines.length && lines[j].trim() === "") j++;
-      if (j >= lines.length) continue;
-
-      const titleLine = lines[j].trim();
-      if (!titleLine.startsWith("#####")) continue;
-
-      const linkStart = titleLine.lastIndexOf("](");
-      const linkEnd = titleLine.lastIndexOf(")");
-      if (linkStart < 0 || linkEnd < 0 || linkEnd <= linkStart + 2) continue;
-
-      const title = normalizeText(
-        titleLine
-          .replace(/^#####\s+/, "")
-          .slice(0, linkStart - "##### ".length)
-          .trim(),
-      ) || normalizeText(alt);
-
-      const href = absolutizeBeaconPath(titleLine.slice(linkStart + 2, linkEnd));
-
-      posts.push({
-        title,
-        href,
-        imageSrc,
-      });
-
-      i = j;
-    }
-  }
-
-  // De-dupe by href
-  const seen = new Set<string>();
-  const deduped = posts.filter((p) => {
-    if (seen.has(p.href)) return false;
-    seen.add(p.href);
-    return true;
-  });
-
-  return {
-    categories,
-    posts: deduped,
-  };
-}
+const posts: BlogPost[] = [
+  {
+    title: "Understanding the Indian REIT Market: A Detailed Guide for Investors",
+    href: "https://beacontrustee.co.in/blog_open/MTg/Understanding the Indian REIT Market: A Detailed Guide for Investors",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/7487_20250407180457_image_(74).png",
+  },
+  {
+    title: "How Securitization can Supporting India's Infrastructure Financing Needs",
+    href: "https://beacontrustee.co.in/blog_open/MTc/How Securitization can Supporting India's Infrastructure Financing Needs",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/5279_20250328152314_image_(70).png",
+  },
+  {
+    title: "How AIFs are Revolutionizing Investment Strategies in India",
+    href: "https://beacontrustee.co.in/blog_open/MTQ/How AIFs are Revolutionizing Investment Strategies in India",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/5290_20250318124704_image_(56).png",
+  },
+  {
+    title: "The Importance of Debenture Trustees in India's Corporate Debt Market",
+    href: "https://beacontrustee.co.in/blog_open/MTU/The Importance of Debenture Trustees in India's Corporate Debt Market",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/6812_20250313172636_image_(13).png",
+  },
+  {
+    title: "How to Choose the Right Trusteeship Services in India",
+    href: "https://beacontrustee.co.in/blog_open/Mw/How to Choose the Right Trusteeship Services in India",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/3816_20250120122833_right_1.png",
+  },
+  {
+    title: "Regulatory Compliance for Debenture Trustees in India",
+    href: "https://beacontrustee.co.in/blog_open/NA/Regulatory Compliance for Debenture Trustees in India",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/6930_20250120123222_regulatory_1.png",
+  },
+  {
+    title: "Understanding the Importance of Debenture Trusteeship Services",
+    href: "https://beacontrustee.co.in/blog_open/Mg/Understanding the Importance of Debenture Trusteeship Services",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/1513_20241216154311_jpeg_testing_blog_1.png",
+  },
+  {
+    title: "Key Benefits of an AIF ( Alternative investment funds )",
+    href: "https://beacontrustee.co.in/blog_open/MTA/Key Benefits of an AIF ( Alternative investment funds )",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/7973_20250120142503_aif_1.png",
+  },
+  {
+    title: "Role of Debenture Trustees in Investor Protection",
+    href: "https://beacontrustee.co.in/blog_open/MTE/Role of Debenture Trustees in Investor Protection",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/9593_20250120142809_investor_1.png",
+  },
+  {
+    title: "Best Practices for Corporate Security Trustees",
+    href: "https://beacontrustee.co.in/blog_open/OA/Best Practices for Corporate Security Trustees",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/6002_20250120141335_corporate_1.png",
+  },
+  {
+    title: "Security Trustee Responsibilities for Loans",
+    href: "https://beacontrustee.co.in/blog_open/OQ/Security Trustee Responsibilities for Loans",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/9137_20250120141645_responsibility_1.png",
+  },
+  {
+    title: "Legal Considerations in Security Trustee Agreements",
+    href: "https://beacontrustee.co.in/blog_open/Ng/Legal Considerations in Security Trustee Agreements",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/5680_20250120124553_legal_1.png",
+  },
+  {
+    title: "The Role of a Security Trustee in Financial Transactions",
+    href: "https://beacontrustee.co.in/blog_open/Nw/The Role of a Security Trustee in Financial Transactions",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/2412_20250120140933_finance_1.png",
+  },
+  {
+    title: "Exploring the Functions of a Trustee in Debenture Issuance",
+    href: "https://beacontrustee.co.in/blog_open/NQ/Exploring the Functions of a Trustee in Debenture Issuance",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/5438_20250120123853_issuance_1.png",
+  },
+  {
+    title: "Key Responsibilities of Debenture Trustees in India",
+    href: "https://beacontrustee.co.in/blog_open/MQ/Key Responsibilities of Debenture Trustees in India",
+    imageSrc: "https://beacontrustee.co.in/cms/documents/blogs/8844_20241205174214_key_1.png",
+  },
+];
 
 export default function BlogPage() {
-  const mdPath = path.join(process.cwd(), "content", "blog", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { categories, posts } = parseBlog(md);
-
   return (
     <main id="top" className="min-h-screen bg-white text-primary-navy">
       <BricknetHeader variant="white" />
@@ -181,10 +163,7 @@ export default function BlogPage() {
                   </p>
 
                   <div className="mt-8 flex flex-wrap gap-2">
-                    {(categories.length > 0
-                      ? categories
-                      : ["All", "Security Trustee", "Debenture Trustee", "AIF", "Securitization", "REITs"]
-                    ).map((cat) => (
+                    {categories.map((cat) => (
                       <span
                         key={cat}
                         className="rounded-sm border border-primary-navy/10 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-primary-navy/60"

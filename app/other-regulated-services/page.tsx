@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,137 +13,44 @@ type ServiceItem = {
   href: string;
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function parseOuterMarkdownLink(line: string) {
-  const outer = line.match(/\)\]\((https?:\/\/[^)]+)\)\s*$/i);
-  if (outer) return outer[1];
-
-  const fallback = line.match(/\((https?:\/\/[^)]+)\)\s*$/i);
-  return fallback?.[1] ?? "";
-}
-
-function parseOtherRegulated(markdown: string): {
-  intro: string;
-  disclaimer: string;
-  services: ServiceItem[];
-  whyBullets: string[];
-  whyImage: string;
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const servicesStart = lines.findIndex((l) => l.trim() === "## Other Regulated Services");
-  const whyStart = lines.findIndex((l) => l.trim() === "## Why Do Business With Beacon?");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const slice = lines.slice(
-    servicesStart >= 0 ? servicesStart + 1 : 0,
-    whyStart > 0 ? whyStart : lines.length,
-  );
-
-  const introLines: string[] = [];
-  let disclaimer = "";
-
-  let i = 0;
-  for (; i < slice.length; i++) {
-    const line = slice[i].trim();
-    if (!line) continue;
-
-    if (line.startsWith("! [") || line.startsWith("![") || line.startsWith("### ")) break;
-
-    if (line.startsWith("*") && line.endsWith("*")) {
-      disclaimer = normalizeText(line.replaceAll("*", ""));
-      continue;
+const data = {
+  intro: "Value addition beyond conventional trusteeship is one of our greatest differentiators. We take pride in ensuring that our one-stop solution motto backed by a wide range of Trustee Services is the answer to your needs.",
+  disclaimer: "These sevices are not regulated by SEBI but by other Financial Sector Regulators. They are separate and distinct from SEBI Regulated Services. None of the SEBI investor protection mechanism will be available for any grievances arising out of or pertaining to such activities.",
+  services: [
+    {
+      id: "service-unlisted-debenture-bond-trustee",
+      number: "01",
+      title: "Unlisted Debenture / Bond Trustee",
+      description: "As a Debenture Trustee, Beacon Trusteeship plays a pivotal role in protecting the interests of debenture holders/bondholders...",
+      href: "https://beacontrustee.co.in/debenture-bond-trusteeship-other-regulated"
+    },
+    {
+      id: "service-securitization-direct-assignment",
+      number: "02",
+      title: "Securitization: Direct Assignment",
+      description: "Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy...",
+      href: "https://beacontrustee.co.in/securitization-trustee-drect-assign"
+    },
+    {
+      id: "service-securitization-pass-through-certificates",
+      number: "03",
+      title: "Securitization: Pass Through Certificates",
+      description: "Securitization is a structured mechanism utilized & envisaged by Banks, NBFCs & Financial Institutions, as a ring-fenced & bankruptcy",
+      href: "https://beacontrustee.co.in/securitization-trustee-pass-through"
     }
-
-    introLines.push(normalizeText(line));
-  }
-
-  const rawServices: Array<{ title: string; description: string; href: string }> = [];
-  let current: { title: string; description: string; href: string } | null = null;
-
-  for (; i < slice.length; i++) {
-    const line = slice[i].trim();
-
-    const heading = line.match(/^###\s+(.+)/);
-    if (heading) {
-      if (current) rawServices.push(current);
-      current = { title: normalizeText(heading[1]), description: "", href: "" };
-      continue;
-    }
-
-    if (!current) continue;
-
-    if (line.toLowerCase().startsWith("[read more")) {
-      current.href = parseOuterMarkdownLink(line);
-      continue;
-    }
-
-    if (!line) continue;
-    if (line.startsWith("![")) continue;
-    if (line.startsWith("## ")) continue;
-
-    current.description = normalizeText(`${current.description} ${line}`.trim());
-  }
-
-  if (current) rawServices.push(current);
-
-  const services: ServiceItem[] = rawServices.map((s, idx) => {
-    const number = String(idx + 1).padStart(2, "0");
-    const id = `service-${slugify(s.title)}`;
-    return {
-      id,
-      number,
-      title: s.title,
-      description: s.description,
-      href: s.href || "https://beacontrustee.co.in/other-regulated-services",
-    };
-  });
-
-  const whySlice = lines.slice(
-    whyStart >= 0 ? whyStart + 1 : 0,
-    end > 0 ? end : lines.length,
-  );
-
-  const whyBullets: string[] = [];
-  let whyImage = "";
-
-  for (const raw of whySlice) {
-    const line = raw.trim();
-    const bullet = line.match(/^\*\s+###\s+(.+)/);
-    if (bullet) whyBullets.push(normalizeText(bullet[1]));
-
-    const img = line.match(/^!\[[^\]]+\]\((https?:\/\/[^)]+)\)/);
-    if (img) whyImage = img[1];
-  }
-
-  return {
-    intro: introLines.join(" "),
-    disclaimer,
-    services,
-    whyBullets,
-    whyImage,
-  };
-}
+  ] as ServiceItem[],
+  whyBullets: [
+    "Quality, Excellence & Trustworthiness",
+    "Client Centric Solutions",
+    "Absolute Confidentiality",
+    "Industry Experience",
+    "Value Added Services"
+  ],
+  whyImage: "https://beacontrustee.co.in/assets/images/why-choose.png"
+};
 
 export default function OtherRegulatedServicesPage() {
-  const mdPath = path.join(process.cwd(), "content", "other-regulated-services", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { intro, disclaimer, services, whyBullets, whyImage } = parseOtherRegulated(md);
+  const { intro, disclaimer, services, whyBullets, whyImage } = data;
 
   return (
     <main id="top" className="min-h-screen bg-white text-primary-navy">
@@ -175,8 +79,7 @@ export default function OtherRegulatedServicesPage() {
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-primary-navy/60">
-                {intro ||
-                  "Value addition beyond conventional trusteeship is one of our greatest differentiators."}
+                {intro}
               </p>
 
               {disclaimer && (
@@ -376,16 +279,7 @@ export default function OtherRegulatedServicesPage() {
 
               <div className="mt-10 bg-white/10 p-px">
                 <div className="divide-y divide-white/10">
-                  {(whyBullets.length > 0
-                    ? whyBullets
-                    : [
-                        "Quality, Excellence & Trustworthiness",
-                        "Client Centric Solutions",
-                        "Absolute Confidentiality",
-                        "Industry Experience",
-                        "Value Added Services",
-                      ]
-                  ).map((item, idx) => (
+                  {whyBullets.map((item, idx) => (
                     <div key={item} className="bg-primary-navy/60 px-8 py-7">
                       <div className="flex items-start justify-between gap-10">
                         <div>
@@ -421,7 +315,7 @@ export default function OtherRegulatedServicesPage() {
               <div className="relative overflow-hidden border border-white/10 bg-white/5">
                 <div className="relative aspect-[4/3] w-full">
                   <Image
-                    src={whyImage || "https://beacontrustee.co.in/assets/images/why-choose.png"}
+                    src={whyImage}
                     alt="Why choose Beacon"
                     fill
                     className="object-cover"

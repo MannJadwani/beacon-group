@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
@@ -14,182 +11,233 @@ type ResearchItem = {
   views: number | null;
 };
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
-
-function absolutizeBeaconPath(url: string) {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `https://beacontrustee.co.in${url}`;
-  return `https://beacontrustee.co.in/${url}`;
-}
-
-function decodeCloudflareEmail(hex: string) {
-  const clean = hex.trim();
-  if (!/^[0-9a-fA-F]+$/.test(clean)) return "";
-  if (clean.length < 4 || clean.length % 2 !== 0) return "";
-
-  const key = parseInt(clean.slice(0, 2), 16);
-  if (!Number.isFinite(key)) return "";
-
-  let out = "";
-  for (let i = 2; i < clean.length; i += 2) {
-    const byte = parseInt(clean.slice(i, i + 2), 16);
-    if (!Number.isFinite(byte)) return "";
-    out += String.fromCharCode(byte ^ key);
-  }
-  return out;
-}
-
-function parseResearchContact(markdown: string): { phone: string; email: string } {
-  const phoneMatch = markdown.match(/\[(\+?[\d\s]+)\]\(tel:[^)]+\)/);
-  const phone = phoneMatch ? normalizeText(phoneMatch[1]) : "+91 8451844276";
-
-  const emailMatch = markdown.match(/\/cdn-cgi\/l\/email-protection#([0-9a-fA-F]+)\b/);
-  const email = emailMatch ? decodeCloudflareEmail(emailMatch[1]) : "research@beacontrustee.co.in";
-
-  return { phone, email };
-}
-
-function parseItems(sectionLines: string[]): ResearchItem[] {
-  const items: ResearchItem[] = [];
-
-  let currentCover = "";
-  let currentTitle = "";
-  let currentHref = "";
-  let currentViews: number | null = null;
-
-  function reset() {
-    currentCover = "";
-    currentTitle = "";
-    currentHref = "";
-    currentViews = null;
-  }
-
-  function pushCurrent() {
-    if (!currentTitle) return;
-    const href = currentHref || currentCover;
-    if (!href) return;
-    items.push({
-      title: currentTitle,
-      href,
-      imageSrc: currentCover || "https://beacontrustee.co.in/assets/images/banners/head-banner-4.jpg",
-      views: currentViews,
-    });
-  }
-
-  for (const raw of sectionLines) {
-    const line = raw.trim();
-    if (!line) continue;
-
-    const coverLink = line.match(/^\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)/);
-    if (coverLink) {
-      const img = absolutizeBeaconPath(coverLink[1]);
-      const href = absolutizeBeaconPath(coverLink[2]);
-
-      // Prefer the cms/documents/png cover art over gallery images.
-      const isPrimary = /\/cms\/documents\/png\//.test(img) || /\/cms\/documents\/png\//.test(href);
-      if (!currentCover || isPrimary) currentCover = img;
-      if (!currentHref || isPrimary) currentHref = href;
-      continue;
+const data = {
+  reports: [
+    {
+      title: "Report On AIF - Part I",
+      href: "https://beacontrustee.co.in/cms/documents/png/report_on_aif_-_part_1_20231201154110_1697.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/report_on_aif_-_part_1_20231201154110_1697.jpg",
+      views: 1073
+    },
+    {
+      title: "Report On Securitization",
+      href: "https://beacontrustee.co.in/cms/documents/png/report_on_securitization__20231201153658_5026.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/report_on_securitization__20231201153658_5026.jpg",
+      views: 189
     }
-
-    const titleLink = line.match(/^\[#####\s+([^\]]+)\]\(([^)]+)\)/);
-    if (titleLink) {
-      currentTitle = normalizeText(titleLink[1]);
-      currentHref = absolutizeBeaconPath(titleLink[2]);
-      continue;
+  ] as ResearchItem[],
+  updates: [
+    {
+      title: "Simplification Of Requirements For Grant Of Accreditati...",
+      href: "https://beacontrustee.co.in/cms/documents/png/simplification_of_requirements_for_grant_of_accreditation_to_investors_20260112183332_8761.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/simplification_of_requirements_for_grant_of_accreditation_to_investors_20260112183332_8761.jpg",
+      views: 2
+    },
+    {
+      title: "Certification Requirement For Compliance Officers Of M...",
+      href: "https://beacontrustee.co.in/cms/documents/png/aifs147852369_20251231124142_8525.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/aifs147852369_20251231124142_8525.jpg",
+      views: 6
+    },
+    {
+      title: "Modification In The Conditions Specified For Reduction ...",
+      href: "https://beacontrustee.co.in/cms/documents/png/hyuiikjsdfghjk_20251223184359_3693.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/hyuiikjsdfghjk_20251223184359_3693.jpg",
+      views: 6
+    },
+    {
+      title: "SEBI Board Meeting - 17th December 2025",
+      href: "https://beacontrustee.co.in/cms/documents/png/sbm147852369_20251223181808_1617.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sbm147852369_20251223181808_1617.jpg",
+      views: 4
+    },
+    {
+      title: "Mandating Periodic Disclosure Requirements - Securitise...",
+      href: "https://beacontrustee.co.in/cms/documents/png/7896543210147_20251219151642_8308.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/7896543210147_20251219151642_8308.jpg",
+      views: 6
+    },
+    {
+      title: "Relaxation On Geo-tagging Requirement In India For NRIs...",
+      href: "https://beacontrustee.co.in/cms/documents/png/25896314745698_20251212162447_7300.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/25896314745698_20251212162447_7300.jpg",
+      views: 6
+    },
+    {
+      title: "Clarification On The Digital Accessibility Circulars Of...",
+      href: "https://beacontrustee.co.in/cms/documents/png/123456789iuytrewq_20251210175838_1228.png",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/123456789iuytrewq_20251210175838_1228.png",
+      views: 5
+    },
+    {
+      title: "Modalities For Migration To AI Only Schemes And Relaxa...",
+      href: "https://beacontrustee.co.in/cms/documents/png/zxcvbnmlkjhgfdsa_20251209182824_5171.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/zxcvbnmlkjhgfdsa_20251209182824_5171.jpg",
+      views: 4
+    },
+    {
+      title: "Modifications To Chapter IV Of The Master Circular For ...",
+      href: "https://beacontrustee.co.in/cms/documents/png/dt_modification_20251203181242_4265.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt_modification_20251203181242_4265.jpg",
+      views: 6
+    },
+    {
+      title: "Specification Of The Terms And Conditions For Debenture...",
+      href: "https://beacontrustee.co.in/cms/documents/png/dt45_20251202182226_3626.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt45_20251202182226_3626.jpg",
+      views: 2
+    },
+    {
+      title: "Timeline For Submission Of Information By The Issuer To...",
+      href: "https://beacontrustee.co.in/cms/documents/png/dt_20251201182006_3571.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt_20251201182006_3571.jpg",
+      views: 3
+    },
+    {
+      title: "Relaxation In Timeline For Disclosure Of Allocation Met...",
+      href: "https://beacontrustee.co.in/cms/documents/png/relaxation_in_timeline_for_disclosure_of_allocation_0987_20251017173914_4093.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/relaxation_in_timeline_for_disclosure_of_allocation_0987_20251017173914_4093.jpg",
+      views: 10
+    },
+    {
+      title: "Compliance Guidelines For Digital Accessibility Circula...",
+      href: "https://beacontrustee.co.in/cms/documents/png/2016879654_20250926174110_7955.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/2016879654_20250926174110_7955.jpg",
+      views: 11
+    },
+    {
+      title: "SEBI Board Meeting - 12th September 2025",
+      href: "https://beacontrustee.co.in/cms/documents/png/bm_12thsept_20250918184148_2164.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/bm_12thsept_20250918184148_2164.jpg",
+      views: 10
+    },
+    {
+      title: "Revised Regulatory Framework For Angel Funds Under AIF ...",
+      href: "https://beacontrustee.co.in/cms/documents/png/7896543210_20250912182917_1651.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/7896543210_20250912182917_1651.jpg",
+      views: 4
+    },
+    {
+      title: "Framework For AIFs To Make Co-investment Within The AIF...",
+      href: "https://beacontrustee.co.in/cms/documents/png/258147369_20250912171317_7872.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/258147369_20250912171317_7872.jpg",
+      views: 6
+    },
+    {
+      title: "Extension Of Timelines And Update Of Reporting Authorit...",
+      href: "https://beacontrustee.co.in/cms/documents/png/0147852369_20250901180426_9468.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/0147852369_20250901180426_9468.jpg",
+      views: 8
+    },
+    {
+      title: "Rights Of Persons With Disabilities Act, 2016 And Rules...",
+      href: "https://beacontrustee.co.in/cms/documents/png/369963_20250811182016_5569.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/369963_20250811182016_5569.jpg",
+      views: 3
+    },
+    {
+      title: "Reserve Bank Of India (Investment In AIF) Directions, 2...",
+      href: "https://beacontrustee.co.in/cms/documents/png/reserve_bank_of_india_(investment_in_aif)_directions,_2025_20250731172739_6896.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/reserve_bank_of_india_(investment_in_aif)_directions,_2025_20250731172739_6896.jpg",
+      views: 9
+    },
+    {
+      title: "Extension Towards Adoption And Implementation Of Cybers...",
+      href: "https://beacontrustee.co.in/cms/documents/png/extension_towards_adoption_and_implementation_of_cybersecurity_and_cyber_resilience_20250701173146_9519.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/extension_towards_adoption_and_implementation_of_cybersecurity_and_cyber_resilience_20250701173146_9519.jpg",
+      views: 11
+    },
+    {
+      title: "SEBI Board Meeting - 18th June 2025",
+      href: "https://beacontrustee.co.in/cms/documents/png/sbm_-_18th_june_2025_20250624163529_5794.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sbm_-_18th_june_2025_20250624163529_5794.jpg",
+      views: 13
+    },
+    {
+      title: "Extension Of Timeline Of Additional Liquidation Period ...",
+      href: "https://beacontrustee.co.in/cms/documents/png/aif_circular_20250609180644_6096.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/aif_circular_20250609180644_6096.jpg",
+      views: 9
+    },
+    {
+      title: "Review Of Provisions Pertaining To Electronic Book Prov...",
+      href: "https://beacontrustee.co.in/cms/documents/png/ksyom_20250522175859_9226.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/ksyom_20250522175859_9226.jpg",
+      views: 10
+    },
+    {
+      title: "Rating Of Municipal Bonds On The Expected Loss (EL) Bas...",
+      href: "https://beacontrustee.co.in/cms/documents/png/municipal_jpeg_20250519181031_2069.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/municipal_jpeg_20250519181031_2069.jpg",
+      views: 11
+    },
+    {
+      title: "Extension Of Timeline For Complying With The Certificat...",
+      href: "https://beacontrustee.co.in/cms/documents/png/aif_new_circular_20250514174342_9366.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/aif_new_circular_20250514174342_9366.jpg",
+      views: 7
+    },
+    {
+      title: "SECURITIES AND EXCHANGE BOARD OF INDIA (LISTING OBLIGAT...",
+      href: "https://beacontrustee.co.in/cms/documents/png/sebi_lodr_img_20250404182723_3305.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_lodr_img_20250404182723_3305.jpg",
+      views: 18
+    },
+    {
+      title: "Extension Towards Adoption And Implementation Of Cybers...",
+      href: "https://beacontrustee.co.in/cms/documents/png/cscrf_&_res_20250331180442_2207.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/cscrf_&_res_20250331180442_2207.jpg",
+      views: 10
+    },
+    {
+      title: "SEBI Board Meeting - 24th March 2025",
+      href: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_24th_march_2025_20250328174022_7147.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_24th_march_2025_20250328174022_7147.jpg",
+      views: 15
+    },
+    {
+      title: "Relaxation In Timeline For Reporting Of Differential Ri...",
+      href: "https://beacontrustee.co.in/cms/documents/png/67890_20250304181333_5748.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/67890_20250304181333_5748.jpg",
+      views: 13
+    },
+    {
+      title: "Relaxation In Timelines For Holding AIFs' Investments...",
+      href: "https://beacontrustee.co.in/cms/documents/png/circular_14th_feb_20250218162205_6834.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/circular_14th_feb_20250218162205_6834.jpg",
+      views: 13
+    },
+    {
+      title: "Private Placement Of Non-Convertible Debentures (NCDs) ...",
+      href: "https://beacontrustee.co.in/cms/documents/png/nbfc_hfc_circular_20250204154845_6514.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/nbfc_hfc_circular_20250204154845_6514.jpg",
+      views: 12
+    },
+    {
+      title: "Measures For Ease Of Doing Business For Credit Rating A...",
+      href: "https://beacontrustee.co.in/cms/documents/png/measures_for_ease_of_doing_business_for_credit_rating_agencies_(cras)_timelines_jpeg_20250110171710_8964.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/measures_for_ease_of_doing_business_for_credit_rating_agencies_(cras)_timelines_jpeg_20250110171710_8964.jpg",
+      views: 22
+    },
+    {
+      title: "SEBI Board Meeting - 18th December 2024",
+      href: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_18th_december_2024_20241219172635_8911.jpg",
+      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_18th_december_2024_20241219172635_8911.jpg",
+      views: null
     }
-
-    const views = line.match(/^(\d+)\s+Views$/i);
-    if (views) {
-      currentViews = Number.parseInt(views[1], 10);
-      pushCurrent();
-      reset();
-    }
+  ] as ResearchItem[],
+  categories: {
+    reports: ["AIF", "Securitization"],
+    updates: ["AIF", "Debenture Trustee", "Investor Grievances", "Board Meetings", "Others"]
+  },
+  contact: {
+    phone: "+91 8451844276",
+    email: "research@beacontrustee.co.in"
   }
-
-  const seen = new Set<string>();
-  return items.filter((item) => {
-    const key = item.href;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function parseCategories(markdown: string): { reports: string[]; updates: string[] } {
-  const lines = markdown.split(/\r?\n/);
-  const start = lines.findIndex((l) => l.trim() === "### Categories");
-  const end = lines.findIndex((l, i) => i > start && l.trim() === "## Copy link");
-  const slice = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-
-  let mode: "reports" | "updates" | "" = "";
-  const reports: string[] = [];
-  const updates: string[] = [];
-
-  for (const raw of slice) {
-    const line = raw.trim();
-    if (!line) continue;
-
-    if (line === "#### Research Reports") {
-      mode = "reports";
-      continue;
-    }
-    if (line === "#### Regulatory Updates") {
-      mode = "updates";
-      continue;
-    }
-    const bullet = line.match(/^\*\s+(.+)/);
-    if (!bullet || !mode) continue;
-
-    const value = normalizeText(bullet[1]);
-    if (!value) continue;
-
-    if (mode === "reports") reports.push(value);
-    if (mode === "updates") updates.push(value);
-  }
-
-  return {
-    reports: Array.from(new Set(reports)),
-    updates: Array.from(new Set(updates)),
-  };
-}
-
-function parseResearch(markdown: string): {
-  reports: ResearchItem[];
-  updates: ResearchItem[];
-  categories: { reports: string[]; updates: string[] };
-  contact: { phone: string; email: string };
-} {
-  const lines = markdown.split(/\r?\n/);
-  const reportsStart = lines.findIndex((l) => l.trim() === "#### Research Reports");
-  const updatesStart = lines.findIndex((l) => l.trim() === "#### Regulatory Updates");
-  const categoriesStart = lines.findIndex((l) => l.trim() === "### Categories");
-
-  const reportsSlice = lines.slice(
-    reportsStart >= 0 ? reportsStart + 1 : 0,
-    updatesStart > 0 ? updatesStart : lines.length,
-  );
-  const updatesSlice = lines.slice(
-    updatesStart >= 0 ? updatesStart + 1 : 0,
-    categoriesStart > 0 ? categoriesStart : lines.length,
-  );
-
-  const reports = parseItems(reportsSlice);
-  const updates = parseItems(updatesSlice);
-  const categories = parseCategories(markdown);
-  const contact = parseResearchContact(markdown);
-
-  return { reports, updates, categories, contact };
-}
+};
 
 export default function ResearchPage() {
-  const mdPath = path.join(process.cwd(), "content", "research", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { reports, updates, categories, contact } = parseResearch(md);
+  const { reports, updates, categories, contact } = data;
 
   return (
     <main id="top" className="min-h-screen bg-white text-primary-navy">
@@ -405,7 +453,7 @@ export default function ResearchPage() {
                 <div className="px-6 py-6">
                   <p className="text-sm font-semibold text-primary-navy">Research Reports</p>
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {(categories.reports.length ? categories.reports : ["AIF", "Securitization"]).map((cat) => (
+                    {categories.reports.map((cat) => (
                       <span
                         key={`reports-${cat}`}
                         className="rounded-sm border border-primary-navy/10 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-primary-navy/60"
@@ -418,9 +466,7 @@ export default function ResearchPage() {
                   <div className="mt-8 border-t border-primary-navy/10 pt-8">
                     <p className="text-sm font-semibold text-primary-navy">Regulatory Updates</p>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      {(categories.updates.length
-                        ? categories.updates
-                        : ["AIF", "Debenture Trustee", "Investor Grievances", "Board Meetings", "Others"])?.map((cat) => (
+                      {categories.updates.map((cat) => (
                         <span
                           key={`updates-${cat}`}
                           className="rounded-sm border border-primary-navy/10 bg-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-primary-navy/60"

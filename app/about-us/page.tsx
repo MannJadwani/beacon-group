@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -23,120 +20,22 @@ type AboutUsContent = {
   companyProfileUrl: string;
 };
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
-
-function absolutizeBeaconPath(url: string) {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `https://beacontrustee.co.in${url}`;
-  return `https://beacontrustee.co.in/${url}`;
-}
-
-function parseLink(markdown: string, label: string) {
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(`\\[${escaped}\\]\\(([^)]+)\\)`);
-  const match = markdown.match(re);
-  return match ? absolutizeBeaconPath(match[1]) : "";
-}
-
-function extractParagraph(lines: string[]) {
-  return normalizeText(
-    lines
-      .map((l) => l.trim())
-      .filter((l) => l && !l.startsWith("![") && !l.startsWith("![]"))
-      .join(" "),
-  );
-}
-
-function parseAboutUs(markdown: string): AboutUsContent {
-  const lines = markdown.split(/\r?\n/);
-  const titleIndex = lines.findIndex((l) => l.trim().startsWith("# "));
-  const endIndex = lines.findIndex((l, i) => i > titleIndex && l.trim() === "## Testimonials");
-  const slice = lines.slice(titleIndex >= 0 ? titleIndex : 0, endIndex > 0 ? endIndex : lines.length);
-
-  const titleLine = slice.find((l) => l.trim().startsWith("# ")) || "# About Us";
-  const title = normalizeText(titleLine.replace(/^#\s+/, ""));
-
-  const sections: Record<string, string[]> = {};
-  let currentKey = "";
-  let currentBody: string[] = [];
-
-  function flush() {
-    if (!currentKey) return;
-    sections[currentKey] = currentBody;
-  }
-
-  for (const raw of slice) {
-    const line = raw.trim();
-    if (line.startsWith("## ")) {
-      flush();
-      currentKey = normalizeText(line.replace(/^##\s+/, ""));
-      currentBody = [];
-      continue;
-    }
-    if (line.startsWith("# ")) continue;
-    if (!currentKey) continue;
-    currentBody.push(raw);
-  }
-  flush();
-
-  const orderedKeys = Object.keys(sections);
-  const leadHeading = orderedKeys[0] || "Overview";
-  const incorporatedHeading = orderedKeys[1] || "Incorporated";
-  const visionHeading = orderedKeys.find((k) => k.toLowerCase().includes("vision")) || "Our Vision";
-  const missionHeading = orderedKeys.find((k) => k.toLowerCase().includes("mission")) || "Our Mission";
-
-  const leadBody = extractParagraph(sections[leadHeading] || []);
-  const incorporatedBody = extractParagraph(sections[incorporatedHeading] || []);
-  const vision = extractParagraph(sections[visionHeading] || []);
-  const mission = extractParagraph(sections[missionHeading] || []);
-
-  const certificateImageLine = slice.find(
-    (l) => l.trim().startsWith("![]( ") || l.trim().startsWith("![](") || l.includes("sebi-certificate"),
-  );
-  const certificateImageMatch = certificateImageLine?.match(/!\[[^\]]*\]\(([^)]+)\)|!\[]\(([^)]+)\)/);
-  const certificateImage =
-    absolutizeBeaconPath((certificateImageMatch?.[1] || certificateImageMatch?.[2] || "").trim()) ||
-    "https://beacontrustee.co.in/assets/images/sebi-certificate-latest.png";
-
-  let missionIcon = "";
-  let visionIcon = "";
-  for (const raw of slice) {
-    const line = raw.trim();
-    const m = line.match(/^!\[([^\]]+)\]\(([^)]+)\)/);
-    if (!m) continue;
-    const alt = normalizeText(m[1]).toLowerCase();
-    const url = absolutizeBeaconPath(m[2]);
-    if (alt.includes("mission")) missionIcon = url;
-    if (alt.includes("vision")) visionIcon = url;
-  }
-
-  const isoUrl = parseLink(markdown, "ISO/IEC 27001:2022 Certified");
-  const companyProfileUrl = parseLink(markdown, "Company Profile");
-
-  return {
-    title,
-    leadHeading,
-    leadBody,
-    incorporatedHeading,
-    incorporatedBody,
-    certificateImage,
-    missionIcon,
-    visionIcon,
-    vision,
-    mission,
-    isoUrl,
-    companyProfileUrl,
-  };
-}
+const content: AboutUsContent = {
+  title: "Value addition beyond conventional Trusteeship",
+  leadHeading: "We're a leading SEBI registered Debenture Trustee offering technology enabled solutions.",
+  leadBody: "Value addition beyond conventional trusteeship is one of our greatest differentiators. We take pride in ensuring that our one-stop solution motto backed by a wide range of Trustee Services is the answer to your needs. Our offerings are based on the valued experience of our principles. With the help of expert opinion and advice of our members & reputed agencies empanelled with us, we continuously aim to enhance the quality of our offerings.",
+  incorporatedHeading: "A SEBI registered Debenture Trustee incorporated in 2015",
+  incorporatedBody: "Formed by a group of ex-bankers and professionals from a similar domain with a high amount of experience in the Trusteeship business, the team in their previous avatars has successfully handled various Trusteeship activities.",
+  certificateImage: "https://beacontrustee.co.in/assets/images/sebi-certificate-latest.png",
+  missionIcon: "https://beacontrustee.co.in/assets/images/mission-who-we-are.svg",
+  visionIcon: "https://beacontrustee.co.in/assets/images/circle-blue.png",
+  vision: "Endeavour to be the fiduciary in the most responsible and productive manner by providing our clients with the most effective solutions.",
+  mission: "To be preferred trustee for our clients through operational excellence and international service quality.",
+  isoUrl: "https://beacontrustee.co.in/assets/certificate/iso.pdf",
+  companyProfileUrl: "https://beacontrustee.co.in/wp-content/uploads/company_profile.pdf",
+};
 
 export default function AboutUsPage() {
-  const mdPath = path.join(process.cwd(), "content", "about_us", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-  const content = parseAboutUs(md);
-
   const nav = [
     { id: "overview", label: "Overview" },
     { id: "credentials", label: "Credentials" },

@@ -1,146 +1,109 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
 import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
-
-function absolutizeBeaconPath(url: string) {
-  if (!url) return url;
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  if (url.startsWith("/")) return `https://beacontrustee.co.in${url}`;
-  return `https://beacontrustee.co.in/${url}`;
-}
-
-function decodeCloudflareEmail(hex: string) {
-  const clean = hex.trim();
-  if (!/^[0-9a-fA-F]+$/.test(clean)) return "";
-  if (clean.length < 4 || clean.length % 2 !== 0) return "";
-
-  const key = parseInt(clean.slice(0, 2), 16);
-  if (!Number.isFinite(key)) return "";
-
-  let out = "";
-  for (let i = 2; i < clean.length; i += 2) {
-    const byte = parseInt(clean.slice(i, i + 2), 16);
-    if (!Number.isFinite(byte)) return "";
-    out += String.fromCharCode(byte ^ key);
-  }
-  return out;
-}
+const CONTACT_DATA = {
+  phone: "+91 9555449955",
+  email: "contact@beacontrustee.co.in",
+  address: "5W, 5th Floor, The Metropolitan, E-Block, Bandra Kurla Complex, Bandra (E), Mumbai 400051",
+  services: [
+    "Alternative Investment Fund",
+    "Bond Trustee",
+    "Commercial Paper Trustee",
+    "Debenture Trustee",
+    "Enforcement Activity",
+    "Escrow Agent",
+    "Facility Agent",
+    "Legal Documentation",
+    "Safe Keeping",
+    "Securitization (DA)",
+    "Security Trustee",
+    "Share Pledge Trustee",
+    "ESOP Trustee",
+    "Securitization (PTC)",
+    "Securitization (C&P-PLI)",
+    "Securitization (SDI)",
+    "Securitization (C&P-PCE)",
+    "Employee Welfare Trust",
+    "Advisory Services",
+    "REIT & InvIT",
+    "Deposit Trustee",
+  ],
+  locations: [
+    { name: "Mumbai", type: "Registered" },
+    { name: "Ahmedabad", type: "Rep" },
+    { name: "Bangalore", type: "Rep" },
+    { name: "Chennai", type: "Rep" },
+    { name: "Delhi", type: "Branch" },
+    { name: "Hyderabad", type: "Rep" },
+    { name: "IFSC Gandhinagar", type: "Branch" },
+    { name: "Jaipur", type: "Rep" },
+    { name: "Pune", type: "Rep" },
+    { name: "Singapore", type: "Rep" },
+    { name: "Dubai", type: "Rep" },
+    { name: "Mauritius", type: "Rep" },
+  ],
+  offices: [
+    {
+      name: "Mumbai",
+      type: "Registered & Corporate Office",
+      address: "5W, 5th Floor, The Metropolitan, E-Block, Bandra Kurla Complex, Bandra (E), Mumbai 400051",
+      image: "https://beacontrustee.co.in/assets/images/offc5.png",
+    },
+    {
+      name: "Ahmedabad",
+      type: "Rep. Office",
+      address: "A/6, Abhivruddhi CHS, Opp Gujarat Vidyapith, Ashram Road, Ahmedabad- 380006",
+      image: "https://beacontrustee.co.in/assets/images/offc6.png",
+    },
+    {
+      name: "Bangalore",
+      type: "Rep. Office",
+      address: "3rd Floor, 53 to 58, Sri Chakravarthy Complex, V V Puram, Sajjan Rao Circle, Bangalore- 560004",
+      image: "https://beacontrustee.co.in/assets/images/offc7.png",
+    },
+    {
+      name: "Chennai",
+      type: "Rep. Office",
+      address: "Flat No.10, III Floor, Parsn Commercial Complex, No. 1, Kodambakkam High Road, Nungambakkam, Chennai - 600034",
+      image: "https://beacontrustee.co.in/assets/images/offc8.png",
+    },
+    {
+      name: "Delhi",
+      type: "Branch Office",
+      address: "715, 7th Floor, Naurang House, Building 21, Kausturba Gandhi Marg, New Delhi- 110001",
+      image: "https://beacontrustee.co.in/assets/images/offc9.png",
+    },
+    {
+      name: "Hyderabad",
+      type: "Rep. Office",
+      address: "#8-2-120/77, Park View Enclave, Plot no 92/A, 3rd Floor, Road No 2, Banjara Hills, Hyderabad 500034",
+      image: "https://beacontrustee.co.in/assets/images/offc10.png",
+    },
+    {
+      name: "IFSC Gandhinagar",
+      type: "Branch Office",
+      address: "1639, Hiranandani Signature, GIFT City, IFSC, Gandhinagar",
+      image: "https://beacontrustee.co.in/assets/images/offc14.png",
+    },
+    {
+      name: "Jaipur",
+      type: "Rep. Office",
+      address: "Behind Kamla Devi, Budhiya Goverment School, Jaipur- 302021",
+      image: "https://beacontrustee.co.in/assets/images/offc12.png",
+    },
+    {
+      name: "Pune",
+      type: "Rep. Office",
+      address: "Bakori Road, Pune 412207",
+      image: "https://beacontrustee.co.in/assets/images/offc13.png",
+    },
+  ],
+};
 
 export default function ContactPage() {
-  const mdPath = path.join(process.cwd(), "content", "contact", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const lines = md.split(/\r?\n/);
-
-  const phoneMatch = md.match(/\+91[\d\s]{6,}/);
-  const phone = phoneMatch ? phoneMatch[0].replace(/\s+/g, " ").trim() : "+91 9555449955";
-
-  const emailMatch = Array.from(md.matchAll(/\/cdn-cgi\/l\/email-protection#([0-9a-fA-F]+)/g));
-  const generalEmail = emailMatch[0]?.[1] ? decodeCloudflareEmail(emailMatch[0][1]) : "contact@beacontrustee.co.in";
-
-  const contentStartIndex = lines.findIndex((l) => l.trim() === "# Contact us");
-  const contentLines = contentStartIndex >= 0 ? lines.slice(contentStartIndex) : lines;
-
-  const addressStartIndex = contentLines.findIndex((l) =>
-    l.includes("Registered & Corporate Office") || l.includes("## Registered & Corporate Office"),
-  );
-
-  const addressHeader = addressStartIndex >= 0 ? contentLines[addressStartIndex] : "";
-  const addressLineMatch = contentLines
-    .slice(addressStartIndex + 1)
-    .find((line) => line.trim() && !line.startsWith("!") && !line.startsWith("##") && !line.includes("email-protection"));
-
-  const address = normalizeText(`${addressHeader.replace(/^##\s+/, "")} ${addressLineMatch ?? ""}`.trim());
-
-  const servicesHeadingIndex = contentLines.findIndex((l) => l.trim() === "Select Services*");
-
-  const servicesSlice = contentLines.slice(servicesHeadingIndex + 1);
-  const services: string[] = [];
-
-  for (let i = 0; i < servicesSlice.length; i++) {
-    const line = servicesSlice[i].trim();
-    if (!line || line.startsWith("##") || line.startsWith("Select Services")) continue;
-    if (line.startsWith("Select Location") || line.startsWith("Captcha") || line.startsWith("Submit")) break;
-    services.push(line);
-  }
-
-  const locationHeadingIndex = contentLines.findIndex((l) => l.trim() === "Select Location*");
-  const locationStartIndex = locationHeadingIndex + 1;
-  const locationHeadingEndIndex = contentLines.findIndex((l, idx) => idx > locationStartIndex && l.trim().startsWith("##"));
-
-  const locationOptions: Array<{ name: string }> = [];
-
-  for (let idx = locationStartIndex; idx < (locationHeadingEndIndex > 0 ? locationHeadingEndIndex : contentLines.length); idx++) {
-    const line = contentLines[idx].trim();
-    if (!line) continue;
-
-    if (line.startsWith("##") || line.startsWith("Captcha") || line.startsWith("Submit")) break;
-    if (line.startsWith("Select")) continue;
-
-    const name = normalizeText(line.replace(/^\*\s+/, ""));
-    if (!name || name.startsWith("![")) continue;
-    locationOptions.push({ name });
-  }
-
-  const officeSectionIndex = contentLines.findIndex((l) => l.trim() === "## Our Offices");
-  const officeLines = officeSectionIndex >= 0 ? contentLines.slice(officeSectionIndex + 1) : [];
-  const locations: Array<{ name: string; type: string; address?: string; image?: string }> = [];
-  let pendingImage: string | undefined;
-  let pendingOfficeType: string | undefined;
-
-  for (let idx = 0; idx < officeLines.length; idx++) {
-    const line = officeLines[idx].trim();
-    if (!line) continue;
-    if (line.startsWith("## ")) break;
-
-    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)/);
-    if (imageMatch) {
-      pendingImage = absolutizeBeaconPath(imageMatch[2]);
-      continue;
-    }
-
-    const officeTypeMatch = line.match(/^(Registered|Rep\.|Branch)\s+Office/i);
-    if (officeTypeMatch) {
-      pendingOfficeType = officeTypeMatch[1].includes("Registered")
-        ? "Registered"
-        : officeTypeMatch[1].includes("Rep.")
-          ? "Rep"
-          : "Branch";
-      continue;
-    }
-
-    const nameMatch = line.match(/^###\s+(.+)/);
-    if (nameMatch) {
-      const name = normalizeText(nameMatch[1]);
-      const addressLines2 = [];
-      let j = idx + 1;
-      while (j < officeLines.length) {
-        const l2 = officeLines[j].trim();
-        if (!l2 || l2.startsWith("![") || l2.startsWith("##") || l2.startsWith("###")) break;
-        addressLines2.push(l2);
-        j++;
-      }
-      const address = normalizeText(addressLines2.join(" "));
-      locations.push({
-        name,
-        type: pendingOfficeType ?? "City",
-        address,
-        image: pendingImage,
-      });
-      pendingImage = undefined;
-      pendingOfficeType = undefined;
-    }
-  }
-
   const nav = [
     { id: "details", label: "Contact Details" },
     { id: "form", label: "Contact Form" },
@@ -186,13 +149,13 @@ export default function ContactPage() {
 
               <div className="mt-10 flex flex-col gap-px bg-primary-navy/10 p-px sm:flex-row sm:max-w-xl">
                 <a
-                  href="tel:+919555449955"
+                  href={`tel:${CONTACT_DATA.phone.replace(/\s+/g, "")}`}
                   className="flex items-center justify-center gap-3 bg-primary-navy px-10 py-6 text-[12px] font-black uppercase tracking-widest text-white transition-all hover:bg-accent-gold"
                 >
                   Call us <span aria-hidden="true">→</span>
                 </a>
                 <a
-                  href={`mailto:${generalEmail}`}
+                  href={`mailto:${CONTACT_DATA.email}`}
                   className="flex items-center justify-center gap-3 bg-white px-10 py-6 text-[12px] font-black uppercase tracking-widest text-primary-navy transition-all hover:bg-primary-navy/[0.02]"
                 >
                   Email us <span aria-hidden="true">→</span>
@@ -215,19 +178,19 @@ export default function ContactPage() {
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">Phone</p>
                       <a
-                        href="tel:+919555449955"
+                        href={`tel:${CONTACT_DATA.phone.replace(/\s+/g, "")}`}
                         className="mt-2 block text-base font-semibold text-primary-navy hover:text-accent-gold"
                       >
-                        {phone}
+                        {CONTACT_DATA.phone}
                       </a>
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">Email</p>
                       <a
-                        href={`mailto:${generalEmail}`}
+                        href={`mailto:${CONTACT_DATA.email}`}
                         className="mt-2 block break-words text-base font-semibold text-primary-navy hover:text-accent-gold"
                       >
-                        {generalEmail}
+                        {CONTACT_DATA.email}
                       </a>
                     </div>
                   </div>
@@ -238,7 +201,7 @@ export default function ContactPage() {
                       Registered & Corporate Office in Mumbai.
                     </p>
                     <p className="mt-2 text-base font-semibold text-primary-navy break-words">
-                      {address}
+                      {CONTACT_DATA.address}
                     </p>
                   </div>
                 </div>
@@ -308,21 +271,21 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">Phone</p>
-                        <p className="mt-2 text-2xl font-medium tabular-nums text-primary-navy">{phone}</p>
+                        <p className="mt-2 text-2xl font-medium tabular-nums text-primary-navy">{CONTACT_DATA.phone}</p>
                       </div>
                       <div>
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">Email</p>
                         <a
-                          href={`mailto:${generalEmail}`}
+                          href={`mailto:${CONTACT_DATA.email}`}
                           className="mt-2 block break-words text-base font-semibold text-primary-navy hover:text-accent-gold"
                         >
-                          {generalEmail}
+                          {CONTACT_DATA.email}
                         </a>
                       </div>
                       <div className="lg:col-span-2">
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">Address</p>
                         <p className="mt-2 text-base font-semibold text-primary-navy break-words">
-                          {address}
+                          {CONTACT_DATA.address}
                         </p>
                       </div>
                     </div>
@@ -390,7 +353,7 @@ export default function ContactPage() {
                           </label>
                           <select className="w-full border border-primary-navy/10 bg-white px-4 py-3 text-primary-navy outline-none focus:border-accent-gold">
                             <option value="">Select a service</option>
-                            {services.map((s) => (
+                            {CONTACT_DATA.services.map((s) => (
                               <option key={s} value={s}>
                                 {s}
                               </option>
@@ -403,7 +366,7 @@ export default function ContactPage() {
                           </label>
                           <select className="w-full border border-primary-navy/10 bg-white px-4 py-3 text-primary-navy outline-none focus:border-accent-gold">
                             <option value="">Select a location</option>
-                            {locationOptions.map((loc) => (
+                            {CONTACT_DATA.locations.map((loc) => (
                               <option key={loc.name} value={loc.name}>
                                 {loc.name}
                               </option>
@@ -451,18 +414,18 @@ export default function ContactPage() {
                 </div>
 
                 <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2" data-aos="fade-up" data-aos-delay={150}>
-                  {locations.map((loc) => (
+                  {CONTACT_DATA.offices.map((office) => (
                     <div
-                      key={loc.name}
+                      key={office.name}
                       className="border border-primary-navy/10 bg-white p-8 transition-all hover:border-accent-gold/30"
                     >
                       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
-                        {loc.image ? (
+                        {office.image ? (
                           <div className="lg:col-span-2">
                             <div className="relative aspect-[16/9] w-full overflow-hidden bg-primary-navy/5">
                               <Image
-                                src={loc.image ?? ""}
-                                alt={loc.name}
+                                src={office.image}
+                                alt={office.name}
                                 fill
                                 className="object-cover"
                                 sizes="(min-width: 1024px) 420px, 100vw"
@@ -475,21 +438,21 @@ export default function ContactPage() {
                           </div>
                         ) : null}
 
-                        <div className={loc.image ? "lg:col-span-2" : "lg:col-span-4"}>
+                        <div className={office.image ? "lg:col-span-2" : "lg:col-span-4"}>
                           <div>
                             <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
-                              {loc.type ?? "Other"}
+                              {office.type}
                             </p>
-                            <p className="mt-2 text-2xl font-semibold text-primary-navy">{loc.name}</p>
+                            <p className="mt-2 text-2xl font-semibold text-primary-navy">{office.name}</p>
                           </div>
 
-                          {loc.address ? (
+                          {office.address ? (
                             <div>
                               <p className="mt-6 text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
                                 Address
                               </p>
                               <p className="mt-2 text-base font-semibold text-primary-navy break-words">
-                                {loc.address}
+                                {office.address}
                               </p>
                             </div>
                           ) : null}

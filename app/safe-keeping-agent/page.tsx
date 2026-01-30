@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -27,132 +24,58 @@ type SafeKeepingContent = {
   offices: OfficeContacts[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (
-        !line ||
-        line.startsWith("![") ||
-        line.startsWith("##") ||
-        line.startsWith("###") ||
-        line.startsWith("*")
-      ) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseSafeKeeping(markdown: string): SafeKeepingContent {
-  const lines = markdown.split(/\r?\n/);
-
-  const titleLine = lines.find((l) => l.trim().startsWith("# ")) ?? "# Safe Keeping Agent";
-  const title = normalizeText(titleLine.replace(/^#\s+/, ""));
-
-  const start = lines.findIndex((l) => l.trim() === titleLine.trim());
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  let intro = "";
-  for (const rawLine of content) {
-    const line = rawLine.trim();
-    if (!line) continue;
-    if (line.startsWith("###")) break;
-    if (line.startsWith("*")) break;
-    intro = normalizeText(line);
-    break;
-  }
-
-  const benefits: string[] = [];
-  const benefitsHeading = content.findIndex((l) => l.trim() === "### Benefit to our Clients:");
-  if (benefitsHeading >= 0) {
-    for (let i = benefitsHeading + 1; i < content.length; i++) {
-      const line = content[i].trim();
-      if (line.startsWith("### ")) break;
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) benefits.push(normalizeText(bm[1]));
-    }
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoHeading = content.findIndex((l) => l.trim() === "### We Also Offer :");
-  if (alsoHeading >= 0) {
-    const officeStart = content.findIndex((l) => l.trim().match(/^###\s+.+Office$/i));
-    const slice = content.slice(alsoHeading + 1, officeStart > 0 ? officeStart : content.length);
-
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const m = line.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!m) continue;
-
-      // Skip self link
-      if (m[2].includes("/safe-keeping-agent")) continue;
-      alsoOffer.push({ label: normalizeText(m[1]), href: m[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title,
-    intro,
-    benefits,
-    alsoOffer,
-    offices,
-  };
-}
+const parsed: SafeKeepingContent = {
+  title: "Safe Keeping Agent",
+  intro: "Safe keeping services are one of the additional services we provide at Beacon. Clients can safely keep their valuable documents, deeds, certificates etc. with Beacon in fire proof safe custody under 24 hours surveillance. The service is offered through an exclusive tie up with Stock Holding Corporation of India Ltd. (SHCIL). With minimal paper work this facility can be availed by the intending clients.",
+  benefits: [
+    "Ease of pan India execution & storage of documents",
+    "Fire proof & theft proof storage of documents",
+    "Digitisation of documents deposited",
+    "Services availed with minimum paperwork",
+  ],
+  alsoOffer: [
+    { label: "Family Office / Family Trust", href: "https://beacontrustee.co.in/family-trust" },
+    { label: "Escrow Agent /Source Code Escrow /M&A /Settlement Escrow", href: "https://beacontrustee.co.in/escrow-monitoring-agency" },
+    { label: "Security Trustee", href: "https://beacontrustee.co.in/security-trustee-services" },
+    { label: "Facility Agent", href: "https://beacontrustee.co.in/facility-agent" },
+    { label: "ESOP / EWT / EBT (For Unlisted Shares)", href: "https://beacontrustee.co.in/esop-unregulated" },
+    { label: "Share Pledge Trustee (For Unlisted Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-unregulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ],
+};
 
 function mapToInternalHref(url: string) {
   try {
@@ -171,11 +94,6 @@ function mapToInternalHref(url: string) {
 }
 
 export default function SafeKeepingAgentPage() {
-  const mdPath = path.join(process.cwd(), "content", "safe-keeping-agent", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const parsed = parseSafeKeeping(md);
-
   const hasShcil = /\bshcil\b/i.test(parsed.intro) || parsed.intro.toLowerCase().includes("stock holding");
 
   const nav = [

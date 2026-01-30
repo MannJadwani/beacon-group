@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -45,313 +42,118 @@ type ParsedAif = {
   highlightValue?: string;
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (
-        !line ||
-        line.startsWith("![") ||
-        line.startsWith("##") ||
-        line.startsWith("###") ||
-        line.startsWith("*")
-      ) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseTrustPrimer(lines: string[]): TrustPrimer | undefined {
-  const start = lines.findIndex((l) => l.trim() === "## What is a Trust?");
-  if (start < 0) return undefined;
-
-  const trustSlice = lines.slice(start + 1);
-
-  const definition: string[] = [];
-  const classifications: string[] = [];
-  const benefits: string[] = [];
-  const responsibilities: string[] = [];
-  const corporateRole: string[] = [];
-  let imageSrc = "";
-
-  const privateTrustHeading = trustSlice.findIndex((l) => l.trim().startsWith("### Private trusts can be classified"));
-  const benefitsHeading = trustSlice.findIndex((l) => l.trim().startsWith("### Benefits"));
-  const responsibilitiesHeading = trustSlice.findIndex((l) => l.trim().startsWith("### The key responsibilities"));
-  const corporateRoleHeading = trustSlice.findIndex((l) => l.trim().startsWith("### Role of Corporate Trustee"));
-
-  // Definition: from beginning to first heading.
-  const firstHeadingIndex = [
-    privateTrustHeading,
-    benefitsHeading,
-    responsibilitiesHeading,
-    corporateRoleHeading,
-  ]
-    .filter((x) => x >= 0)
-    .sort((a, b) => a - b)[0];
-
-  const definitionSlice = trustSlice.slice(0, firstHeadingIndex ?? trustSlice.length);
-  for (const raw of definitionSlice) {
-    const line = raw.trim();
-    if (!line) continue;
-    if (line.startsWith("![")) continue;
-    if (line.startsWith("##") || line.startsWith("###")) break;
-    definition.push(normalizeText(line));
-  }
-
-  // Classifications
-  if (privateTrustHeading >= 0) {
-    const endAt = [benefitsHeading, responsibilitiesHeading, corporateRoleHeading]
-      .filter((x) => x > privateTrustHeading)
-      .sort((a, b) => a - b)[0];
-    const slice = trustSlice.slice(privateTrustHeading + 1, endAt ?? trustSlice.length);
-    for (const raw of slice) {
-      const line = raw.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) classifications.push(normalizeText(bm[1]));
-    }
-  }
-
-  // Benefits
-  if (benefitsHeading >= 0) {
-    const endAt = [responsibilitiesHeading, corporateRoleHeading]
-      .filter((x) => x > benefitsHeading)
-      .sort((a, b) => a - b)[0];
-    const slice = trustSlice.slice(benefitsHeading + 1, endAt ?? trustSlice.length);
-    for (const raw of slice) {
-      const line = raw.trim();
-      const img = line.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-      if (img) imageSrc = img[1];
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) benefits.push(normalizeText(bm[1]));
-    }
-  }
-
-  // Responsibilities
-  if (responsibilitiesHeading >= 0) {
-    const endAt = [corporateRoleHeading]
-      .filter((x) => x > responsibilitiesHeading)
-      .sort((a, b) => a - b)[0];
-    const slice = trustSlice.slice(responsibilitiesHeading + 1, endAt ?? trustSlice.length);
-    for (const raw of slice) {
-      const line = raw.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) responsibilities.push(normalizeText(bm[1]));
-      const img = line.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-      if (img) imageSrc = img[1];
-    }
-  }
-
-  // Corporate role
-  if (corporateRoleHeading >= 0) {
-    const slice = trustSlice.slice(corporateRoleHeading + 1);
-    for (const raw of slice) {
-      const line = raw.trim();
-      if (line.startsWith("## ")) break;
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) corporateRole.push(normalizeText(bm[1]));
-      const img = line.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-      if (img) imageSrc = img[1];
-    }
-  }
-
-  // Fallback image
-  if (!imageSrc) {
-    for (const raw of trustSlice) {
-      const img = raw.trim().match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-      if (img) {
-        imageSrc = img[1];
-        break;
-      }
-    }
-  }
-
-  return {
-    definition,
-    classifications,
-    benefits,
-    responsibilities,
-    corporateRole,
-    imageSrc,
-  };
-}
-
-function parseAif(markdown: string): ParsedAif {
-  const lines = markdown.split(/\r?\n/);
-
-  const titleLine = lines.find((l) => l.trim().startsWith("# ")) ?? "# Alternative Investment Funds";
-  const title = normalizeText(titleLine.replace(/^#\s+/, ""));
-
-  const start = lines.findIndex((l) => l.trim() === titleLine.trim());
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  const trustPrimer = parseTrustPrimer(content);
-  const trustStart = content.findIndex((l) => l.trim() === "## What is a Trust?");
-  const main = trustStart >= 0 ? content.slice(0, trustStart) : content;
-
-  const servicesHeading = main.findIndex((l) => l.trim().startsWith("### As a Trustee to an AIF Trust"));
-  const benefitHeading = main.findIndex((l) => l.trim() === "### Benefit to Investment Manager");
-  const alsoHeading = main.findIndex((l) => l.trim() === "### We Also Offer :");
-
-  // Intro blocks: up until servicesHeading.
-  const introBlocks: string[] = [];
-  if (servicesHeading >= 0) {
-    const introSlice = main.slice(0, servicesHeading);
-    for (const rawLine of introSlice) {
-      const line = rawLine.trim();
-      if (!line) continue;
-      if (line.startsWith("##") || line.startsWith("###")) continue;
-      introBlocks.push(normalizeText(line));
-    }
-  }
-
-  // Pull highlight value from intro (INR ... Crores)
-  const highlightMatch = introBlocks
-    .join(" ")
-    .match(/INR\s+[0-9,]+\.?[0-9]*\s+Crores/i);
-  const highlightValue = highlightMatch?.[0]?.replace(/\s+/g, " ").trim();
-
-  // Services
-  const services: AifServices = { documents: [], accounts: [], other: [] };
-
-  if (servicesHeading >= 0) {
-    const endIndex = benefitHeading >= 0 ? benefitHeading : alsoHeading >= 0 ? alsoHeading : main.length;
-    const slice = main.slice(servicesHeading + 1, endIndex);
-
-    let mode: "documents" | "accounts" | "other" = "other";
-
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      if (!line) continue;
-
-      const top = line.match(/^\*\s+(.+)/);
-      const sub = line.match(/^\+\s+(.+)/);
-
-      if (top) {
-        const text = normalizeText(top[1]);
-
-        if (text.toLowerCase().startsWith("drafting") && text.toLowerCase().includes("investment documents")) {
-          mode = "documents";
-          continue;
-        }
-
-        if (text.toLowerCase().startsWith("opening") && text.toLowerCase().includes("managing")) {
-          mode = "accounts";
-          continue;
-        }
-
-        mode = "other";
-        services.other.push(text);
-        continue;
-      }
-
-      if (sub) {
-        const text = normalizeText(sub[1]);
-        if (mode === "documents") services.documents.push(text);
-        if (mode === "accounts") services.accounts.push(text);
-      }
-    }
-  }
-
-  // Manager benefits
-  const managerBenefits: string[] = [];
-  if (benefitHeading >= 0) {
-    const endIndex = alsoHeading >= 0 ? alsoHeading : main.length;
-    const slice = main.slice(benefitHeading + 1, endIndex);
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) managerBenefits.push(normalizeText(bm[1]));
-    }
-  }
-
-  // Also offer links
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  if (alsoHeading >= 0) {
-    const officeStart = main.findIndex((l) => l.trim().match(/^###\s+.+Office$/i));
-    const slice = main.slice(alsoHeading + 1, officeStart > 0 ? officeStart : main.length);
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const m = line.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!m) continue;
-      if (m[2].includes("/alternative-investment-fund")) continue;
-      alsoOffer.push({ label: normalizeText(m[1]), href: m[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(main);
-
-  return {
-    title,
-    introBlocks,
-    services,
-    managerBenefits,
-    alsoOffer,
-    offices,
-    trustPrimer,
-    highlightValue,
-  };
-}
+const parsed: ParsedAif = {
+  title: "Alternative Investment Funds",
+  introBlocks: [
+    "An Alternative Investment Fund (AIF) is a privately pooled investment vehicle – set up as Trust, Company, Limited Liability Partnership (LLP) or a Body Corporate – collecting funds from investors of both, Indian & Foreign origin. In India, AIFs are regulated by SEBI & covered under Securities Exchange Board of India (Alternative Investment Funds) Regulations, 2012. We act as Trustee for AIFs set up as a Trust.",
+    "AIFs in India have opened a new avenue for Investors, of Indian & Foreign origin, providing diverse investment options in contrast to conventional modes provided by portfolio management services or mutual funds. In the past decade, more specifically after the release of SEBI Regulations for AIFs in India, AIFs have gained huge popularity amongst investors, the likes of which encompass Indian & Foreign corporates, PIOs, NRIs, OCIs, HNIs, etc., envisaging India as a golden investment opportunity. The fact that registered AIFs in India raised INR 212,979.40 Crores on a net cumulative basis till December 31, 2020, posits the preference avid Investors have for Alternative Investment Funds.",
+  ],
+  services: {
+    documents: [
+      "Trust Deed",
+      "Contribution Agreement",
+      "Investment Management Agreement",
+      "Private Placement Memorandum",
+    ],
+    accounts: [
+      "Bank Accounts",
+      "Custodian Account",
+      "Depository Account",
+    ],
+    other: [
+      "Start-to-end assistance in applying for registration with SEBI",
+      "Assistance in PAN & TAN Application",
+      "Appointing Auditors for verification & audit of Trust Accounts",
+      "Continuous & effective liaising to & fro the Investment Manager",
+      "Timely disclosures & compliance reporting to SEBI & Tax Authorities",
+      "Promptly addressing Investor grievances & queries",
+      "Monitoring compliance of AIF & Investment Manager with terms of PPM",
+    ],
+  },
+  managerBenefits: [
+    "Enabling allocation of crucial resources – time, money & manpower, for core business activities",
+    "Expeditious application for registration with SEBI & Trust's PAN & TAN",
+    "Execution & Registration of Trust Deed",
+    "Hassle-free opening & management of accounts with Banks & Depositories",
+    "Reminders for ensuring timely reporting to SEBI & Investors",
+    "Proactive follow-up for adherence with extant regulations & terms as stipulated in Investment Documents",
+    "Single point of contact for communication to & fro with Investors",
+  ],
+  alsoOffer: [
+    { label: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee", href: "https://beacontrustee.co.in/debenture-bond-trusteeship-listed" },
+    { label: "Securitization: Securitized Debt Instruments (SDIs)", href: "https://beacontrustee.co.in/securitization-trustee-regulated" },
+    { label: "REIT & InvIT", href: "https://beacontrustee.co.in/reit-invit" },
+    { label: "Escrow Services: Fractional Shares Escrow", href: "https://beacontrustee.co.in/escrow-fractional-regulated" },
+    { label: "Escrow Services: Investor Protection Fund Escrow", href: "https://beacontrustee.co.in/escrow-ipef-regulated" },
+    { label: "ESOP (For Listed Shares)", href: "https://beacontrustee.co.in/esop-regulated" },
+    { label: "Share Pledge Trustee (For Listed Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-regulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ],
+  trustPrimer: {
+    definition: [
+      "A trust is a relationship in which: A person or entity (the Trustee) holds legal title to certain property (the Trust Property) but is bound by a fiduciary duty to exercise that legal control for the benefit of one or more individuals or organizations (the Beneficiary), who hold 'beneficial' title. Such beneficiaries may be limited to the family members under a family trust / private trust. A trust is usually governed by the terms of the executed trust instrument (the Trust Deed) and the applicable law of the land. The entity (one or more individuals, a partnership, or a corporation) that creates a trust is called the Grantor/Settlor.",
+    ],
+    classifications: [
+      "Revocable Trust vs. Irrevocable Trust: Revocable trusts can be altered or terminated, while irrevocable trusts cannot",
+      "Discretionary Trust vs. Specific Trust: Discretionary trusts grant the trustee discretion in distributing income/assets, while specific trusts have fixed beneficiaries",
+    ],
+    benefits: [
+      "In the Event of a Personal Dispute assets of the trusts are not attached",
+      "The Tax Structure of the Trust is most Beneficial as compared to individual",
+      "Succession Planning works well under Tax Structure as Compared to nominating individual as a Nominee",
+    ],
+    responsibilities: [
+      "Administration: The corporate trustee handles the day-to-day administrative tasks of the trust, such as record-keeping, asset management, and compliance with legal and regulatory requirements",
+      "Fiduciary duty: The corporate trustee has a fiduciary duty to act in the best interests of the beneficiaries, ensuring that the trust's assets are managed prudently and in accordance with the trust's terms",
+      "Distribution of income and assets: The corporate trustee is responsible for distributing income and assets from the trust to the beneficiaries according to the terms of the trust document. They ensure that distributions are made in a fair and equitable manner",
+      "Objective decision-making: As a neutral third party, a corporate trustee can make impartial decisions, avoiding conflicts of interest that may arise when family members serve as trustees",
+    ],
+    corporateRole: [
+      "The role of a corporate trustee in a private trust is to act as a professional entity responsible for managing and administering the trust on behalf of the beneficiaries. It is advisable to opt for corporate trustee for family trust as it provide benefits of corporate with long term sustainability and corporate governance. When selecting a corporate trustee, consider factors such as their reputation, financial stability, range of services offered, fee structure, and communication and responsiveness",
+    ],
+    imageSrc: "https://beacontrustee.co.in/assets/images/family_t.JPG",
+  },
+  highlightValue: "INR 212,979.40 Crores",
+};
 
 function mapToInternalHref(url: string) {
   try {
     const u = new URL(url);
     if (u.hostname !== "beacontrustee.co.in") return url;
 
-    // Only map to routes we actually have.
     if (u.pathname === "/security-trustee-services") return "/security-trustee-services";
     if (u.pathname === "/escrow-monitoring-agency") return "/escrow-monitoring-agency";
     if (u.pathname === "/facility-agent") return "/facility-agent";
@@ -365,11 +167,6 @@ function mapToInternalHref(url: string) {
 }
 
 export default function AlternativeInvestmentFundPage() {
-  const mdPath = path.join(process.cwd(), "content", "alternative-investment-fund", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const parsed = parseAif(md);
-
   const nav = [
     { id: "overview", label: "Overview" },
     { id: "deliverables", label: "Deliverables" },

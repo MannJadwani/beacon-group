@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,177 +22,82 @@ type OfficeContacts = {
   people: ContactPerson[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function parseDepositTrustee(markdown: string): {
-  intro: string;
-  numberedPoints: string[];
-  sections: BulletSection[];
-  alsoOffer: Array<{ label: string; href: string }>;
-  offices: OfficeContacts[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Deposit Trustee");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const slice = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-
-  // Intro: first paragraph after the form block.
-  // We detect intro as the first non-empty line after "Submit".
-  const submitIndex = slice.findIndex((l) => l.trim() === "Submit");
-  const afterSubmit = submitIndex >= 0 ? slice.slice(submitIndex + 1) : slice;
-
-  let intro = "";
-  for (const raw of afterSubmit) {
-    const line = raw.trim();
-    if (!line) continue;
-    if (line.startsWith("1.")) break;
-    intro = normalizeText(line);
-    break;
-  }
-
-  const numberedPoints: string[] = [];
-  for (const raw of afterSubmit) {
-    const line = raw.trim();
-    const m = line.match(/^\d+\.\s+(.+)/);
-    if (m) numberedPoints.push(normalizeText(m[1]));
-    if (line.startsWith("### ")) break;
-  }
-
-  const headings: Array<{ title: string; index: number }> = [];
-  for (let i = 0; i < afterSubmit.length; i++) {
-    const line = afterSubmit[i].trim();
-    const hm = line.match(/^###\s+(.+)/);
-    if (hm) headings.push({ title: normalizeText(hm[1]), index: i });
-  }
-
-  const sections: BulletSection[] = [];
-  for (let i = 0; i < headings.length; i++) {
-    const h = headings[i];
-    const next = headings[i + 1];
-    const sectionSlice = afterSubmit.slice(h.index + 1, next ? next.index : afterSubmit.length);
-
-    if (h.title.toLowerCase().startsWith("we also offer")) continue;
-
-    const bullets: string[] = [];
-    for (const raw of sectionSlice) {
-      const line = raw.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) bullets.push(normalizeText(bm[1]));
-      if (line.trim().startsWith("### ")) break;
-    }
-
-    if (bullets.length === 0) continue;
-
-    sections.push({
-      id: slugify(h.title),
-      title: h.title,
-      bullets,
-    });
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = afterSubmit.findIndex((l) => l.trim() === "### We Also Offer :");
-  const officeStart = afterSubmit.findIndex((l) => l.trim().startsWith("### ") && l.trim().toLowerCase().includes("office"));
-
-  if (alsoStart >= 0) {
-    const alsoSlice = afterSubmit.slice(alsoStart + 1, officeStart > 0 ? officeStart : afterSubmit.length);
-    for (const raw of alsoSlice) {
-      const line = raw.trim();
-      const lm = line.match(/^\*\s+\[.*?\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-
-      const labelMatch = line.match(/^\*\s+\[.*?\)\s*([^\]]+)\]\(/);
-      // The markdown is: * [![](icon) Label](url)
-      const label = normalizeText(line.replace(/^\*\s+\[.*?\)\s*/, "").replace(/\]\(.+\)$/, ""));
-
-      alsoOffer.push({
-        label,
-        href: lm[1],
-      });
-    }
-  }
-
-  // Offices and contacts
-  const offices: OfficeContacts[] = [];
-  const officeIndices: Array<{ office: string; index: number }> = [];
-
-  for (let i = 0; i < afterSubmit.length; i++) {
-    const line = afterSubmit[i].trim();
-    const m = line.match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const officeSlice = afterSubmit.slice(o.index + 1, next ? next.index : afterSubmit.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < officeSlice.length; j++) {
-      const line = officeSlice[j].trim();
-      // Pattern: Name (line), **Role** (line), **[phone](tel:...)** (line)
-      if (!line || line.startsWith("![")) continue;
-
-      // detect name lines by excluding headings and bullets
-      if (line.startsWith("##") || line.startsWith("###") || line.startsWith("*") || line.startsWith("[") || line.startsWith("Submit")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-
-      const roleLine = officeSlice[j + 1]?.trim() ?? "";
-      const phoneLine = officeSlice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", "").trim());
-      const phoneMatch = phoneLine.match(/\[\+?\d[^\]]+\]\((tel:[^)]+)\)/i);
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneMatch || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return {
-    intro,
-    numberedPoints,
-    sections,
-    alsoOffer,
-    offices,
-  };
-}
+const depositTrusteeData = {
+  intro: "Under the new Companies Act, 2013, appointment of deposit trustee is mandatory for corporates (both public and private) raising secured deposits from individuals, partnerships and HUFs. RBI requires NBFCs to maintain at all times full cover for public deposits accepted by them.",
+  numberedPoints: [
+    "NBFC to create a floating charge on the statutory liquid assets in favour of their depositors.",
+    "Floating charge can be created on statutory liquid assets, in favour of depositors through the mechanism of trust deed.",
+  ],
+  sections: [
+    {
+      id: "customised-services",
+      title: "Our customised services include:",
+      bullets: [
+        "Creation of security in favour of depositors",
+        "Expeditious redressing of depositor grievances",
+        "Ensuring compliance with extant RBI & NHB regulations",
+        "Follow-up for timely submission of NBS1, NBS2 & NBS3 as submitted by the NBFCs / HFCs to RBI / NHB",
+      ],
+    },
+    {
+      id: "company-deposits",
+      title: "Applicable in case of company deposits:",
+      bullets: [
+        "Monitoring of deposit insurance",
+        "Monitoring of charged assets of the company",
+        "Monitoring the creation and adequacy of deposit repayment reserve account",
+      ],
+    },
+  ] as BulletSection[],
+  alsoOffer: [
+    { label: "Debenture Trustee", href: "https://beacontrustee.co.in/debenture-bond-trusteeship" },
+    { label: "Security Trustee Services", href: "https://beacontrustee.co.in/security-trustee-services" },
+    { label: "Facility Agent", href: "https://beacontrustee.co.in/facility-agent" },
+    { label: "Securitization Trustee", href: "https://beacontrustee.co.in/securitization-trustee" },
+    { label: "Share Pledge Trustee", href: "https://beacontrustee.co.in/share-pledge-trustee" },
+    { label: "Alternative Investment Fund (AIF)", href: "https://beacontrustee.co.in/alternative-investment-fund" },
+    { label: "Escrow & Monitoring Agency", href: "https://beacontrustee.co.in/escrow-monitoring-agency" },
+    { label: "Safe Keeping Agent", href: "https://beacontrustee.co.in/safe-keeping-agent" },
+    { label: "REIT & InvIT", href: "https://beacontrustee.co.in/reit-invit" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ] as OfficeContacts[],
+};
 
 export default function DepositTrusteePage() {
-  const mdPath = path.join(process.cwd(), "content", "deposit-trustee", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { intro, numberedPoints, sections, alsoOffer, offices } = parseDepositTrustee(md);
+  const { intro, numberedPoints, sections, alsoOffer, offices } = depositTrusteeData;
 
   const nav = [
     { id: "overview", label: "Overview" },

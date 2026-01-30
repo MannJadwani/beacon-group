@@ -1,36 +1,9 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
 import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
-
-const SERVICE_LINK_MAP: Record<string, string> = {
-  "https://beacontrustee.co.in/services": "/services",
-  "https://beacontrustee.co.in/debenture-bond-trusteeship-listed": "/debenture-bond-trusteeship",
-  "https://beacontrustee.co.in/alternative-investment-fund": "/alternative-investment-fund",
-  "https://beacontrustee.co.in/securitization-trustee-regulated": "/securitization-trustee",
-  "https://beacontrustee.co.in/reit-invit": "/reit-invit",
-  "https://beacontrustee.co.in/escrow-fractional-regulated": "/escrow-fractional-regulated",
-  "https://beacontrustee.co.in/escrow-ipef-regulated": "/escrow-ipef-regulated",
-  "https://beacontrustee.co.in/esop-regulated": "/esop-regulated",
-  "https://beacontrustee.co.in/share-pledge-trustee-regulated": "/share-pledge-trustee-regulated",
-};
-
-function mapServiceHref(href: string) {
-  if (!href) return href;
-  const clean = href.replace(/\/$/, "");
-  return SERVICE_LINK_MAP[clean] ?? href;
-}
-
-type SplitBullets = {
-  id: string;
-  title: string;
-  bullets: string[];
-};
 
 type ContactPerson = {
   name: string;
@@ -43,151 +16,71 @@ type OfficeContacts = {
   people: ContactPerson[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (!line || line.startsWith("![") || line.startsWith("##") || line.startsWith("###") || line.startsWith("*")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
+// Hardcoded data for Share Pledge Trustee page
+const SHARE_PLEDGE_DATA = {
+  title: "Share Pledge Trustee",
+  intro: "One of the common transactions we come across in today's market is Loan against Shares. In this kind of a product a lender (typically a Bank or an NBFC) lends against adequate collateral. The collateral is normally the pledge of listed shares (in most cases). In some cases one may have to deal with be partial collateral of liquid listed shares along with unlisted shares as collateral. The lenders decide a mechanism to monitor these on a daily basis. The Trustee here plays the role of monitoring these shares for the lenders so that adequate margin is maintained against the market value of shares offered under the pledge. The margin calculation is as advised by the lender(s) which adequacy depends upon the volatility of pledged shares and/or market conditions.",
+  introBullets: [
+    "Pledge of shares are held by us for the benefit of the lender for the entire tenor of the transaction.",
+    "Valuation of shares is continuously conducted by us for the listed shares pledged with us on a daily, weekly & monthly basis. Daily reports are generated & sent to the relevant lenders along with the requirement of the margins",
+    "Event of Default trigger is issued in cases & we as a Trustee invoke the pledge on the instructions received from the lender(s)",
+    "In cases where defaults are triggered, shares may be sold by us on behalf of the lender(s) through various broking entities that we may choose to appoint.",
+    "There have been cases of shares pledged through the consortium lending method for which we play a crucial role of monitoring on behalf of the lender(s). Here too like any other collateral, we behave like our role in case of a Security Trustee on behalf of multiple lenders. It's convenient for the borrower company as well as the entire group of lenders"
+  ],
+  benefitTitle: "Benefits to Borrower & Lender",
+  benefitBullets: [
+    "Hassle free pledge of securities in physical & demat form.",
+    "Pledge done in favour of an independent non-partisan third party.",
+    "Daily / Periodic valuation of listed securities.",
+    "Expeditious operations enable timely disbursement of sanctioned facilities.",
+    "Monitoring of:",
+    "Asset Cover maintained",
+    "Trigger Events",
+    "Compliance with terms of sanction",
+    "Diligent retention & release of securities pledged.",
+    "Proactive post-default action for invocation of pledge in adherence with Lender instructions & extant laws, regulations & guidelines."
+  ],
+  alsoOffer: [
+    { label: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee", href: "/debenture-bond-trusteeship" },
+    { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
+    { label: "Securitization: Securitized Debt Instruments (SDIs)", href: "/securitization-trustee" },
+    { label: "REIT & InvIT", href: "/reit-invit" },
+    { label: "Escrow Services: Fractional Shares Escrow", href: "/escrow-fractional-regulated" },
+    { label: "Escrow Services: Investor Protection Fund Escrow", href: "/escrow-ipef-regulated" },
+    { label: "ESOP (For Listed Shares)", href: "/esop-regulated" },
+    { label: "Share Pledge Trustee (For Listed Shares)", href: "/share-pledge-trustee-regulated" }
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+        { name: "Vinod Manjrekar", role: "Vice President", phone: "+91 8976944231" }
+      ]
+    },
+    {
+      office: "Delhi Office",
+      people: [{ name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" }]
+    },
+    {
+      office: "Hyderabad Office",
+      people: [{ name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" }]
+    },
+    {
+      office: "Bangalore Office",
+      people: [{ name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" }]
+    },
+    {
+      office: "Chennai Office",
+      people: [{ name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" }]
     }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseSharePledge(markdown: string): {
-  title: string;
-  intro: string;
-  bullets: string[];
-  benefitTitle: string;
-  benefitBullets: string[];
-  alsoOffer: Array<{ label: string; href: string }>;
-  offices: OfficeContacts[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Share Pledge Trustee (For Listed Shares)");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  const introLines: string[] = [];
-  const bullets: string[] = [];
-  let i = 0;
-  for (; i < content.length; i++) {
-    const line = content[i].trim();
-    if (!line) continue;
-    if (line.startsWith("### ")) break;
-    if (line.startsWith("![")) continue;
-
-    const bullet = line.match(/^\*\s+(.+)/);
-    if (bullet) {
-      bullets.push(normalizeText(bullet[1]));
-      continue;
-    }
-
-    introLines.push(normalizeText(line));
-  }
-
-  const benefitIndex = content.findIndex((l) => l.trim().toLowerCase().startsWith("### benefits to"));
-  const benefitTitle = benefitIndex >= 0 ? normalizeText(content[benefitIndex].replace(/^###\s+/, "")) : "Benefits";
-  const benefitBullets: string[] = [];
-  if (benefitIndex >= 0) {
-    for (let j = benefitIndex + 1; j < content.length; j++) {
-      const line = content[j].trim();
-      if (line.startsWith("### ")) break;
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) benefitBullets.push(normalizeText(bm[1]));
-    }
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = content.findIndex((l) => l.trim().toLowerCase().startsWith("### we also offer"));
-  if (alsoStart >= 0) {
-    const alsoSlice = content.slice(alsoStart + 1);
-    for (const rawLine of alsoSlice) {
-      const line = rawLine.trim();
-      const lm = line.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-      alsoOffer.push({ label: normalizeText(lm[1]), href: lm[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title: "Share Pledge Trustee",
-    intro: introLines.join(" "),
-    bullets,
-    benefitTitle,
-    benefitBullets,
-    alsoOffer,
-    offices,
-  };
-}
+  ] as OfficeContacts[]
+};
 
 export default function SharePledgeTrusteeRegulatedPage() {
-  const mdPath = path.join(process.cwd(), "content", "share-pledge-trustee-regulated", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { title, intro, bullets, benefitTitle, benefitBullets, alsoOffer, offices } = parseSharePledge(md);
+  const { title, intro, introBullets, benefitTitle, benefitBullets, alsoOffer, offices } = SHARE_PLEDGE_DATA;
 
   const nav = [
     { id: "overview", label: "Overview" },
@@ -284,7 +177,7 @@ export default function SharePledgeTrusteeRegulatedPage() {
                     We track pledged share value, margin adequacy, and enforce lender instructions when trigger events occur.
                   </p>
                   <ul className="mt-8 grid grid-cols-1 gap-3 text-sm text-white/80">
-                    {(bullets.length > 0 ? bullets.slice(0, 4) : ["Daily valuation", "Margin monitoring", "Event triggers", "Pledge invocation"]).map(
+                    {(introBullets.length > 0 ? introBullets.slice(0, 4) : ["Daily valuation", "Margin monitoring", "Event triggers", "Pledge invocation"]).map(
                       (item) => (
                         <li key={item} className="flex items-start gap-3">
                           <span className="mt-2 size-1.5 rounded-full bg-accent-gold" aria-hidden="true" />
@@ -385,7 +278,7 @@ export default function SharePledgeTrusteeRegulatedPage() {
                           Typical coverage
                         </p>
                         <ul className="mt-6 space-y-3 text-sm text-primary-navy/70">
-                          {(bullets.length > 0 ? bullets.slice(0, 4) : ["Daily valuation", "Margin adequacy", "Default triggers", "Pledge invocation"]).map(
+                          {(introBullets.length > 0 ? introBullets.slice(0, 4) : ["Daily valuation", "Margin adequacy", "Default triggers", "Pledge invocation"]).map(
                             (t) => (
                               <li key={t} className="flex items-start gap-3">
                                 <span className="mt-2 size-1.5 bg-accent-gold" aria-hidden="true" />
@@ -413,7 +306,7 @@ export default function SharePledgeTrusteeRegulatedPage() {
 
                 <div className="mt-12">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {(bullets.length > 0 ? bullets : []).map((b, idx) => (
+                    {(introBullets.length > 0 ? introBullets : []).map((b, idx) => (
                       <div key={`monitor-${idx}`} className="border border-primary-navy/10 bg-white px-6 py-5">
                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
                           Item {String(idx + 1).padStart(2, "0")}
@@ -421,7 +314,7 @@ export default function SharePledgeTrusteeRegulatedPage() {
                         <p className="mt-3 text-sm leading-relaxed text-primary-navy/70">{b}</p>
                       </div>
                     ))}
-                    {bullets.length === 0 && (
+                    {introBullets.length === 0 && (
                       <div className="border border-primary-navy/10 bg-white px-6 py-5">
                         <p className="text-sm leading-relaxed text-primary-navy/70">
                           Monitoring includes valuation, margin adequacy, and lender trigger support throughout the pledge lifecycle.
@@ -533,7 +426,7 @@ export default function SharePledgeTrusteeRegulatedPage() {
 
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2" data-aos="fade-up" data-aos-delay={150}>
               {alsoOffer.slice(0, 6).map((link) => {
-                const href = mapServiceHref(link.href);
+                const href = link.href;
                 const isExternal = href.startsWith("http");
 
                 return (

@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,198 +5,106 @@ import { BricknetFooter } from "@/components/layout/BricknetFooter";
 import { BricknetHeader } from "@/components/layout/BricknetHeader";
 import { CtaSection } from "@/components/sections/CtaSection";
 
-const SERVICE_LINK_MAP: Record<string, string> = {
-  "https://beacontrustee.co.in/services": "/services",
-  "https://beacontrustee.co.in/debenture-bond-trusteeship-listed": "/debenture-bond-trusteeship",
-  "https://beacontrustee.co.in/alternative-investment-fund": "/alternative-investment-fund",
-  "https://beacontrustee.co.in/securitization-trustee-regulated": "/securitization-trustee",
-  "https://beacontrustee.co.in/reit-invit": "/reit-invit",
-  "https://beacontrustee.co.in/escrow-fractional-regulated": "/escrow-fractional-regulated",
-  "https://beacontrustee.co.in/escrow-ipef-regulated": "/escrow-ipef-regulated",
-  "https://beacontrustee.co.in/esop-regulated": "/esop-regulated",
-  "https://beacontrustee.co.in/share-pledge-trustee-regulated": "/share-pledge-trustee-regulated",
+// Hardcoded data extracted from content/debenture-bond-trusteeship/index.md
+const pageData = {
+  title: "Debenture / Bond Trustee",
+  intro:
+    "As a Debenture Trustee, Beacon Trusteeship plays a pivotal role in protecting the interests of debenture holders/bondholders and acting as an efficacious intermediary liaison between the investors & the debenture/bond issuer. We specialize in various disciplines of debenture trustee services in India. A testimonial to this is the fact that we were ranked by Prime Database as No. 2 Debenture Trustee of our nation for the most debenture issues handled in the F.Y. 2020. Our work scope broadly encapsulates advising the issuer for modes of security creation, ensuring timely creation & perfection of charge on such security, monitoring asset coverage & ensuring compliance with applicable regulations, acts, rules, terms of issue & covenants throughout the currency of such debenture/bond issue.",
+  sections: [
+    {
+      id: "at-beacon-trusteeship-we-strive-to-assure",
+      title: "At Beacon Trusteeship, we strive to assure",
+      bullets: [
+        "Assistance to Issuer in Security Creation.",
+        "Ensuring timely registration of charge with ROC, CERSAI & Information Utility.",
+        "Verifying Title & Valuation of Security / Collateral offered.",
+        "Retention of Security & continuous monitoring of asset cover.",
+        "Follow up for timely interest payments & principal redemption.",
+        "Meticulous compliance with Listing Agreement, SEBI Regulations, Companies Act, 2013 & applicable Rules, Notifications & Circulars as issued/amended from time to time.",
+        "Prompt response to Investor Grievances.",
+        "Proactive security enforcement as per terms of Trust Deed &/or instructions of debenture holders while adhering to applicable laws & regulations.",
+        "Effectual communication to & fro with Stock Exchange, Depository & Credit Rating Agencies.",
+      ],
+    },
+    {
+      id: "being-a-one-stop-debenture-trustee",
+      title: "Being a one-stop Debenture Trustee to our clients, we also offer",
+      bullets: [
+        "Advisory for structuring debt instruments.",
+        "Drafting & Vetting of Transaction Documents.",
+        "Assistance applying for dematerialization of securities with Depository.",
+        "Assistance in acquiring listing approval from Stock Exchanges",
+        "Set up of Escrow Accounts & cash flows mechanism.",
+        "Safe Custody & digitisation of Documents.",
+        "Automated MIS & crucial Milestone Reports as per client's needs.",
+      ],
+    },
+    {
+      id: "benefit-to-debenture-bond-issuer",
+      title: "Benefit to Debenture / Bond Issuer",
+      bullets: [
+        "Freedom to allocate crucial resources – time, money & manpower, in core business activities.",
+        "Single contact point for any communication to be made to or consent to be taken from debenture/bond holders.",
+        "Structured road map to having a compliant debt issue.",
+        "360-degree outlook on various applicable laws & regulations.",
+      ],
+    },
+    {
+      id: "benefit-to-debenture-bond-holders",
+      title: "Benefit to Debenture / Bond Holders",
+      bullets: [
+        "Timely updates on Interest Payments, Principal Redemption & Asset Cover maintenance among many other crucial aspects of the debt issue.",
+        "Single point of contact for communicating all Investor Grievances & Queries.",
+        "Expeditious & Effective security enforcement as per terms of Trust Deed &/or instructions of debenture holders while maintaining adherence to applicable laws & regulations.",
+        "Investor Education w.r.t. applicable legal & regulatory avenues.",
+      ],
+    },
+  ],
+  alsoOffer: [
+    { label: "Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee", href: "/debenture-bond-trusteeship" },
+    { label: "Alternative Investment Funds", href: "/alternative-investment-fund" },
+    { label: "Securitization: Securitized Debt Instruments (SDIs)", href: "/securitization-trustee" },
+    { label: "REIT & InvIT", href: "/reit-invit" },
+    { label: "Escrow Services: Fractional Shares Escrow", href: "/escrow-fractional-regulated" },
+    { label: "Escrow Services: Investor Protection Fund Escrow", href: "/escrow-ipef-regulated" },
+    { label: "ESOP (For Listed Shares)", href: "/esop-regulated" },
+    { label: "Share Pledge Trustee (For Listed Shares)", href: "/share-pledge-trustee-regulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [{ name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" }],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [{ name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" }],
+    },
+    {
+      office: "Bangalore Office",
+      people: [{ name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" }],
+    },
+    {
+      office: "Chennai Office",
+      people: [{ name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" }],
+    },
+  ],
 };
-
-function mapServiceHref(href: string) {
-  if (!href) return href;
-  const clean = href.replace(/\/$/, "");
-  return SERVICE_LINK_MAP[clean] ?? href;
-}
-
-type SplitBullets = {
-  id: string;
-  title: string;
-  bullets: string[];
-};
-
-type ContactPerson = {
-  name: string;
-  role: string;
-  phone: string;
-};
-
-type OfficeContacts = {
-  office: string;
-  people: ContactPerson[];
-};
-
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (!line || line.startsWith("![") || line.startsWith("##") || line.startsWith("###") || line.startsWith("*")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseDebentureTrustee(markdown: string): {
-  title: string;
-  intro: string;
-  sections: SplitBullets[];
-  alsoOffer: Array<{ label: string; href: string }>;
-  offices: OfficeContacts[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Listed Non-Convertible Debenture (NCD) / Bond / Municipal Bond Trustee");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  const introLines: string[] = [];
-  let i = 0;
-  for (; i < content.length; i++) {
-    const line = content[i].trim();
-    if (!line) continue;
-    if (line.startsWith("### ")) break;
-    if (line.startsWith("![")) continue;
-    introLines.push(normalizeText(line));
-  }
-
-  const headings: Array<{ title: string; index: number }> = [];
-  for (let j = 0; j < content.length; j++) {
-    const m = content[j].trim().match(/^###\s+(.+)/);
-    if (m) headings.push({ title: normalizeText(m[1]), index: j });
-  }
-
-  const sections: SplitBullets[] = [];
-  for (let j = 0; j < headings.length; j++) {
-    const h = headings[j];
-    const next = headings[j + 1];
-    const slice = content.slice(h.index + 1, next ? next.index : content.length);
-
-    if (h.title.toLowerCase().startsWith("we also offer")) continue;
-    if (h.title.toLowerCase().includes("office")) continue;
-
-    const bullets: string[] = [];
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) bullets.push(normalizeText(bm[1]));
-    }
-
-    if (bullets.length === 0) continue;
-
-    sections.push({
-      id: slugify(h.title),
-      title: h.title,
-      bullets,
-    });
-  }
-
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = content.findIndex((l) => l.trim().toLowerCase().startsWith("### we also offer"));
-  if (alsoStart >= 0) {
-    const alsoSlice = content.slice(alsoStart + 1);
-    for (const rawLine of alsoSlice) {
-      const line = rawLine.trim();
-      const lm = line.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-      alsoOffer.push({ label: normalizeText(lm[1]), href: lm[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title: "Debenture / Bond Trustee",
-    intro: introLines.join(" "),
-    sections,
-    alsoOffer,
-    offices,
-  };
-}
 
 export default function DebentureBondTrusteeshipPage() {
-  const mdPath = path.join(process.cwd(), "content", "debenture-bond-trusteeship", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { title, intro, sections, alsoOffer, offices } = parseDebentureTrustee(md);
+  const { title, intro, sections, alsoOffer, offices } = pageData;
 
   const nav = [
     { id: "overview", label: "Overview" },
     ...sections.map((s) => ({ id: s.id, label: s.title })),
-    ...(offices.length > 0 ? [{ id: "contacts", label: "Contacts" }] : []),
+    { id: "contacts", label: "Contacts" },
   ];
 
   return (
@@ -255,8 +160,7 @@ export default function DebentureBondTrusteeshipPage() {
                 data-aos="fade-up"
                 data-aos-delay={200}
               >
-                {intro ||
-                  "Beacon Trusteeship protects debenture holder interests, ensures compliant security creation, and serves as a fiduciary liaison between issuers and investors."}
+                {intro}
               </p>
 
               <div className="mt-10 flex flex-col gap-px bg-white/20 p-px sm:flex-row sm:max-w-xl" data-aos="fade-up" data-aos-delay={300}>
@@ -450,99 +354,88 @@ export default function DebentureBondTrusteeshipPage() {
                 ))}
               </div>
 
-              {alsoOffer.length > 0 && (
-                <section className="mt-24" data-aos="fade-up" aria-label="We also offer">
-                  <div className="border-b border-primary-navy/10 pb-6">
-                    <span className="inline-flex items-center gap-2 bg-primary-navy px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                      <span className="block size-1.5 bg-accent-gold" aria-hidden="true" />
-                      We also offer
-                    </span>
-                    <h2 className="mt-6 text-4xl font-medium leading-[1.1] text-primary-navy lg:text-5xl">
-                      Related services
-                    </h2>
-                  </div>
+              <section className="mt-24" data-aos="fade-up" aria-label="We also offer">
+                <div className="border-b border-primary-navy/10 pb-6">
+                  <span className="inline-flex items-center gap-2 bg-primary-navy px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                    <span className="block size-1.5 bg-accent-gold" aria-hidden="true" />
+                    We also offer
+                  </span>
+                  <h2 className="mt-6 text-4xl font-medium leading-[1.1] text-primary-navy lg:text-5xl">
+                    Related services
+                  </h2>
+                </div>
 
-                  <div className="mt-12 bg-primary-navy/10 p-px">
-                    <div className="grid grid-cols-1 gap-px sm:grid-cols-2">
-                      {alsoOffer.slice(0, 6).map((link) => {
-                        const href = mapServiceHref(link.href);
-                        const isExternal = href.startsWith("http");
-
-                        return (
-                          <a
-                            key={link.href}
-                            href={href}
-                            target={isExternal ? "_blank" : undefined}
-                            rel={isExternal ? "noopener noreferrer" : undefined}
-                            className="group bg-white p-8 transition-colors hover:bg-primary-navy hover:text-white"
-                          >
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40 group-hover:text-accent-gold">
-                              Explore
-                            </p>
-                            <p className="mt-4 text-xl font-medium leading-tight text-primary-navy group-hover:text-white">
-                              {link.label}
-                            </p>
-                            <div className="mt-8 text-[10px] font-black uppercase tracking-[0.25em] text-primary-navy/50 group-hover:text-accent-gold">
-                              Open <span className="text-accent-gold">→</span>
-                            </div>
-                          </a>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </section>
-              )}
-
-              {offices.length > 0 && (
-                <section id="contacts" className="mt-24 scroll-mt-28" data-aos="fade-up" aria-label="Contacts">
-                  <div className="border-b border-primary-navy/10 pb-6">
-                    <span className="inline-flex items-center gap-2 bg-primary-navy px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
-                      <span className="block size-1.5 bg-accent-gold" aria-hidden="true" />
-                      Contacts
-                    </span>
-                    <h2 className="mt-6 text-4xl font-medium leading-[1.1] text-primary-navy lg:text-5xl">
-                      Office contacts
-                    </h2>
-                  </div>
-
-                  <div className="mt-12 space-y-10">
-                    {offices.map((o) => (
-                      <div key={o.office} className="bg-primary-navy/10 p-px">
-                        <div className="bg-white p-8 lg:p-10">
-                          <div className="flex items-center justify-between gap-10">
-                            <h3 className="text-2xl font-medium leading-tight text-primary-navy">
-                              {o.office}
-                            </h3>
-                            <span className="h-px w-16 bg-accent-gold" aria-hidden="true" />
-                          </div>
-
-                          <div className="mt-8 grid grid-cols-1 gap-px bg-primary-navy/10 sm:grid-cols-2">
-                            {o.people.map((p) => (
-                              <div key={`${o.office}-${p.phone}`} className="bg-white p-7">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
-                                  Contact
-                                </p>
-                                <p className="mt-3 text-lg font-semibold text-primary-navy">
-                                  {p.name}
-                                </p>
-                                <p className="mt-2 text-sm text-primary-navy/60">
-                                  {p.role}
-                                </p>
-                                <a
-                                  href={`tel:${p.phone.replace(/\s+/g, "")}`}
-                                  className="mt-5 inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.25em] text-primary-navy/70 hover:text-accent-gold"
-                                >
-                                  {p.phone} <span className="text-accent-gold">→</span>
-                                </a>
-                              </div>
-                            ))}
-                          </div>
+                <div className="mt-12 bg-primary-navy/10 p-px">
+                  <div className="grid grid-cols-1 gap-px sm:grid-cols-2">
+                    {alsoOffer.slice(0, 6).map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="group bg-white p-8 transition-colors hover:bg-primary-navy hover:text-white"
+                      >
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40 group-hover:text-accent-gold">
+                          Explore
+                        </p>
+                        <p className="mt-4 text-xl font-medium leading-tight text-primary-navy group-hover:text-white">
+                          {link.label}
+                        </p>
+                        <div className="mt-8 text-[10px] font-black uppercase tracking-[0.25em] text-primary-navy/50 group-hover:text-accent-gold">
+                          Open <span className="text-accent-gold">→</span>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
-                </section>
-              )}
+                </div>
+              </section>
+
+              <section id="contacts" className="mt-24 scroll-mt-28" data-aos="fade-up" aria-label="Contacts">
+                <div className="border-b border-primary-navy/10 pb-6">
+                  <span className="inline-flex items-center gap-2 bg-primary-navy px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                    <span className="block size-1.5 bg-accent-gold" aria-hidden="true" />
+                    Contacts
+                  </span>
+                  <h2 className="mt-6 text-4xl font-medium leading-[1.1] text-primary-navy lg:text-5xl">
+                    Office contacts
+                  </h2>
+                </div>
+
+                <div className="mt-12 space-y-10">
+                  {offices.map((o) => (
+                    <div key={o.office} className="bg-primary-navy/10 p-px">
+                      <div className="bg-white p-8 lg:p-10">
+                        <div className="flex items-center justify-between gap-10">
+                          <h3 className="text-2xl font-medium leading-tight text-primary-navy">
+                            {o.office}
+                          </h3>
+                          <span className="h-px w-16 bg-accent-gold" aria-hidden="true" />
+                        </div>
+
+                        <div className="mt-8 grid grid-cols-1 gap-px bg-primary-navy/10 sm:grid-cols-2">
+                          {o.people.map((p) => (
+                            <div key={`${o.office}-${p.phone}`} className="bg-white p-7">
+                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary-navy/40">
+                                Contact
+                              </p>
+                              <p className="mt-3 text-lg font-semibold text-primary-navy">
+                                {p.name}
+                              </p>
+                              <p className="mt-2 text-sm text-primary-navy/60">
+                                {p.role}
+                              </p>
+                              <a
+                                href={`tel:${p.phone.replace(/\s+/g, "")}`}
+                                className="mt-5 inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.25em] text-primary-navy/70 hover:text-accent-gold"
+                              >
+                                {p.phone} <span className="text-accent-gold">→</span>
+                              </a>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
             </div>
           </div>
         </div>

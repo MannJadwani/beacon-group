@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -31,181 +28,94 @@ type VideoItem = {
   url: string;
 };
 
-function normalizeText(input: string) {
-  return input.replaceAll("**", "").replace(/\s+/g, " ").trim();
-}
+const listingImages: ListingImage[] = [
+  { src: "https://beacontrustee.co.in/assets/images/nse_1.jpg", number: "01" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_2.jpg", number: "02" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_3.jpg", number: "03" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_4.jpg", number: "04" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_5.jpg", number: "05" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_6.jpg", number: "06" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_7.jpg", number: "07" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_8.jpg", number: "08" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_9.jpg", number: "09" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_10.jpg", number: "10" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_11.jpg", number: "11" },
+  { src: "https://beacontrustee.co.in/assets/images/nse_12.jpg", number: "12" },
+];
 
-function parsePress(markdown: string): {
-  title: string;
-  listingImages: ListingImage[];
-  news: NewsArticle[];
-  viewAllNewsUrl: string;
-  covers: MagazineCover[];
-  videos: VideoItem[];
-} {
-  const lines = markdown.split(/\r?\n/);
+const news: NewsArticle[] = [
+  {
+    title: "Digital Gold in Emerging Markets: What are the opportunities and challenges for investors?",
+    href: "https://www.livemint.com/money/personal-finance/digital-gold-in-emerging-markets-what-are-the-opportunities-and-challenges-for-investors-11682182482298.html",
+    date: "25 April, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/mint.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/gold.jpg",
+  },
+  {
+    title: "SEBI to issue mutual fund light regulations in an effort to reduce compliance requirements for passive funds",
+    href: "https://www.livemint.com/news/india/sebi-to-issue-mutual-fund-light-regulations-in-an-effort-to-reduce-compliance-requirements-for-passive-funds-11685114772099.html",
+    date: "26 May, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/mint.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/mint_2.jpg",
+  },
+  {
+    title: "Active Vs Auto: Which Route Should You Opt For NPS Investment? Explained",
+    href: "https://www.goodreturns.in/personal-finance/investment/active-vs-auto-which-route-should-you-opt-for-nps-investment-explained-1285837.html",
+    date: "10 June, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/goodreturns.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/pension.jpg",
+  },
+  {
+    title: "Explained: Why PPF Should Not Be A Long Term Bet of 15-Year Lock In Period?",
+    href: "https://www.goodreturns.in/personal-finance/investment/explained-why-ppf-should-not-be-a-long-term-bet-of-15-year-lock-in-period-1285836.html?story=1",
+    date: "10 June, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/goodreturns.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/good.jpg",
+  },
+  {
+    title: "RBI monetary policy: Shaktikanta Das-led MPC keeps repo rate steady at 6.50%. Predicts 6.5% GDP growth in FY24",
+    href: "https://www.livemint.com/economy/rbi-monetary-policy-shaktikanta-das-led-mpc-kepps-repo-rate-unchanged-at-650-11691640921674.html",
+    date: "10 August, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/mint.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/governor.jpg",
+  },
+  {
+    title: "Which Stocks/Sectors To Bet After RBI Announced Incremental CRR For Banks?",
+    href: "https://www.goodreturns.in/personal-finance/investment/which-stocks-sectors-to-bet-after-rbi-announced-incremental-crr-for-banks-1294089.html",
+    date: "13 August, 2023",
+    sourceLogo: "https://beacontrustee.co.in/assets/images/goodreturns.png",
+    imageSrc: "https://beacontrustee.co.in/assets/images/stocks.jpg",
+  },
+];
 
-  const start = lines.findIndex((l) => l.trim() === "# First and only listed Trustee company in India");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-  const slice = lines.slice(start >= 0 ? start : 0, end > 0 ? end : lines.length);
+const viewAllNewsUrl = "https://beacontrustee.co.in/press_view_all";
 
-  const title = "Press & Media";
+const covers: MagazineCover[] = [
+  { coverSrc: "https://beacontrustee.co.in/assets/images/cover_2.png", pdfUrl: "https://beacontrustee.co.in/wp-content/uploads/press_release/india_today.pdf" },
+  { coverSrc: "https://beacontrustee.co.in/assets/images/cover_3.png", pdfUrl: "https://beacontrustee.co.in/wp-content/uploads/press_release/business_today.pdf" },
+  { coverSrc: "https://beacontrustee.co.in/assets/images/cover_magazine_2.png", pdfUrl: "https://beacontrustee.co.in/wp-content/uploads/press_release/magazine_cover_image.pdf" },
+  { coverSrc: "https://beacontrustee.co.in/assets/images/cover_4.jpg", pdfUrl: "https://beacontrustee.co.in/wp-content/uploads/press_release/cover_4.pdf" },
+  { coverSrc: "https://beacontrustee.co.in/assets/images/cover_5.jpg", pdfUrl: "https://beacontrustee.co.in/wp-content/uploads/press_release/cover_5.pdf" },
+];
 
-  const newsHeadingIndex = slice.findIndex((l) => l.trim() === "## News Articles");
-  const coversHeadingIndex = slice.findIndex((l) => l.trim() === "## Business Magazines Cover");
-  const videosHeadingIndex = slice.findIndex((l) => l.trim() === "## Featured Videos");
-
-  // Listing images (NSE ceremony photos)
-  const listingImages: ListingImage[] = [];
-  const listingSlice = slice.slice(
-    1,
-    newsHeadingIndex > 0 ? newsHeadingIndex : slice.length,
-  );
-  for (const raw of listingSlice) {
-    const line = raw.trim();
-    const m = line.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-    if (!m) continue;
-    listingImages.push({
-      src: m[1],
-      number: String(listingImages.length + 1).padStart(2, "0"),
-    });
-  }
-
-  // News articles
-  const news: NewsArticle[] = [];
-  let viewAllNewsUrl = "";
-  if (newsHeadingIndex >= 0) {
-    const newsSlice = slice.slice(
-      newsHeadingIndex + 1,
-      coversHeadingIndex > 0 ? coversHeadingIndex : slice.length,
-    );
-
-    let currentLogo = "";
-    let currentTitle = "";
-    let currentHref = "";
-    let currentImage = "";
-    let currentDate = "";
-
-    function pushCurrent() {
-      if (!currentTitle || !currentHref) return;
-      news.push({
-        title: currentTitle,
-        href: currentHref,
-        date: currentDate,
-        sourceLogo: currentLogo,
-        imageSrc: currentImage,
-      });
-    }
-
-    for (const raw of newsSlice) {
-      const line = raw.trim();
-      if (!line) continue;
-
-      const viewAll = line.match(/^\[VIEW ALL NEWS\]\((https?:\/\/[^)]+)\)/i);
-      if (viewAll) {
-        viewAllNewsUrl = viewAll[1];
-        continue;
-      }
-
-      const logo = line.match(/^!\[logo\]\((https?:\/\/[^)]+)\)/i);
-      if (logo) {
-        // If a new logo starts and we already have an article in progress, flush.
-        if (currentTitle && currentHref) {
-          pushCurrent();
-          currentTitle = "";
-          currentHref = "";
-          currentImage = "";
-          currentDate = "";
-        }
-        currentLogo = logo[1];
-        continue;
-      }
-
-      const link = line.match(/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (link && !line.toUpperCase().includes("VIEW ALL NEWS")) {
-        currentTitle = normalizeText(link[1]);
-        currentHref = link[2];
-        continue;
-      }
-
-      const img = line.match(/^!\[[^\]]*\]\((https?:\/\/[^)]+)\)/);
-      if (img && currentTitle) {
-        currentImage = img[1];
-        continue;
-      }
-
-      const date = line.match(/^\d{1,2}\s+[A-Za-z]+,\s+\d{4}$/);
-      if (date) {
-        currentDate = line;
-        pushCurrent();
-        currentLogo = "";
-        currentTitle = "";
-        currentHref = "";
-        currentImage = "";
-        currentDate = "";
-      }
-    }
-  }
-
-  // Magazine covers
-  const covers: MagazineCover[] = [];
-  if (coversHeadingIndex >= 0) {
-    const coverSlice = slice.slice(
-      coversHeadingIndex + 1,
-      videosHeadingIndex > 0 ? videosHeadingIndex : slice.length,
-    );
-
-    for (const raw of coverSlice) {
-      const line = raw.trim();
-      const m = line.match(/^\[!\[[^\]]*\]\((https?:\/\/[^)]+)\)\]\((https?:\/\/[^)]+)\)/);
-      if (!m) continue;
-      covers.push({ coverSrc: m[1], pdfUrl: m[2] });
-    }
-  }
-
-  // Videos
-  const videos: VideoItem[] = [];
-  if (videosHeadingIndex >= 0) {
-    const videoSlice = slice.slice(videosHeadingIndex + 1);
-
-    let pendingUrl = "";
-    for (let i = 0; i < videoSlice.length; i++) {
-      const line = videoSlice[i].trim();
-      if (!line) continue;
-
-      const vidLink = line.match(/^\[!\[[^\]]*\]\([^)]*\)\]\((https?:\/\/[^)]+)\)/);
-      if (vidLink) {
-        pendingUrl = vidLink[1];
-        continue;
-      }
-
-      const titleMatch = line.match(/^####\s+(.+)/);
-      if (titleMatch && pendingUrl) {
-        videos.push({
-          title: normalizeText(titleMatch[1]),
-          url: pendingUrl,
-        });
-        pendingUrl = "";
-      }
-    }
-  }
-
-  return {
-    title,
-    listingImages,
-    news,
-    viewAllNewsUrl,
-    covers,
-    videos,
-  };
-}
+const videos: VideoItem[] = [
+  { title: "Pratapsingh Nathani Decodes Beacon Trusteeship's Vision", url: "https://youtu.be/Sr0SWoY3jmQ?si=oYIxhZDUJXwJ3MzA" },
+  { title: "Unveiling The Core Vision Of Beacon Trusteeship: Insights From Pratapsingh Nathanani", url: "https://youtu.be/2o3xOQGG2PQ?si=s-c770ydv6KA_6q5" },
+  { title: "Pratapsingh Nathani In A Rapid Fire Episode On Let's Talk Business - Don't Miss It!", url: "https://youtu.be/56WFMIw_4SA?si=RYj3KpWliKUUDaPV" },
+  { title: "Pratapsingh Nathani Reveals AIF Regulation Shifts & GIFT City Moves", url: "https://youtu.be/EAlWHLbkix4?si=NaOBnE0el5QZAwya" },
+  { title: "Insider Scoop: Pratapsingh Nathani's Jaw-Dropping Insights On Real Estate Success", url: "https://youtu.be/3lJAITnDKxc?si=4KXlyBYh1b1ZSRDw" },
+  { title: "Introducing Beacon Trusteeship : The Premier Corporate Trustee", url: "https://youtu.be/Xbf9dXR-W-A" },
+  { title: "Founder's Talk with Mr. Pratap Singh Nathani", url: "https://youtu.be/1zGLGt1mlbo" },
+  { title: "Meet the A-Team : Beacon Trusteeship Limited", url: "https://youtu.be/1sj7FsL2D3M" },
+  { title: "2016 to 2024: Key Highlight & Milestones | Beacon Trusteeship Limited", url: "https://youtu.be/U-FYovYSf6c" },
+  { title: "Beacon Trusteeship - Exclusive Discussion with the Top Management | SMEmitra", url: "https://youtu.be/acLI-7R22Sk" },
+  { title: "India's First Trustee Company To be Listed on NSE - Beacon Trusteeship Limited", url: "https://youtu.be/FQgCb0idbI0" },
+  { title: "Highlights of listing Ceremony of Beacon Trusteeship Limited", url: "https://youtu.be/JEXHhSuM0kY" },
+  { title: "Beacon Trusteeship Ltd chosen by Alpha Ideas as one of 12 SMEs to showcase to 550+ investors", url: "https://youtu.be/NsGC6X_TBAM" },
+  { title: "In Conversation with Beacon Trusteeship Ltd Management | CMD - Pratapsingh Nathani #BeaconGroup", url: "https://youtu.be/JqxVHoQDcEk" },
+];
 
 export default function PressPage() {
-  const mdPath = path.join(process.cwd(), "content", "press", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { listingImages, news, viewAllNewsUrl, covers, videos } = parsePress(md);
-
   const nav = [
     { id: "listing", label: "Listing" },
     { id: "news", label: "News" },

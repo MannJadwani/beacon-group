@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 import Link from "next/link";
 
@@ -25,165 +22,113 @@ type OfficeContacts = {
   people: ContactPerson[];
 };
 
-function normalizeText(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function slugify(input: string) {
-  return input
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
-}
-
-function extractAfterSubmit(lines: string[]) {
-  const submitIndex = lines.findIndex((l) => l.trim() === "Submit");
-  return submitIndex >= 0 ? lines.slice(submitIndex + 1) : lines;
-}
-
-function parseOfficeContacts(lines: string[]): OfficeContacts[] {
-  const offices: OfficeContacts[] = [];
-
-  const officeIndices: Array<{ office: string; index: number }> = [];
-  for (let i = 0; i < lines.length; i++) {
-    const m = lines[i].trim().match(/^###\s+(.+Office)$/i);
-    if (m) officeIndices.push({ office: normalizeText(m[1]), index: i });
-  }
-
-  for (let i = 0; i < officeIndices.length; i++) {
-    const o = officeIndices[i];
-    const next = officeIndices[i + 1];
-    const slice = lines.slice(o.index + 1, next ? next.index : lines.length);
-
-    const people: ContactPerson[] = [];
-
-    for (let j = 0; j < slice.length; j++) {
-      const line = slice[j].trim();
-      if (!line || line.startsWith("![") || line.startsWith("##") || line.startsWith("###") || line.startsWith("*")) {
-        continue;
-      }
-
-      const name = normalizeText(line);
-      const roleLine = slice[j + 1]?.trim() ?? "";
-      const phoneLine = slice[j + 2]?.trim() ?? "";
-
-      const role = normalizeText(roleLine.replaceAll("*", ""));
-      const phoneTextMatch = phoneLine.match(/\*\*\[(\+?\d[^\]]+)\]\(/i);
-
-      if (!role || !phoneTextMatch) continue;
-
-      people.push({
-        name,
-        role,
-        phone: phoneTextMatch[1].replace(/\s+/g, " ").trim(),
-      });
-
-      j += 2;
-    }
-
-    if (people.length > 0) {
-      offices.push({ office: o.office, people });
-    }
-  }
-
-  return offices;
-}
-
-function parseSecurityTrustee(markdown: string): {
-  title: string;
-  introBlocks: string[];
-  sections: SplitBullets[];
-  alsoOffer: Array<{ label: string; href: string }>;
-  offices: OfficeContacts[];
-} {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.trim() === "# Security Trustee");
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const raw = lines.slice(start >= 0 ? start + 1 : 0, end > 0 ? end : lines.length);
-  const content = extractAfterSubmit(raw);
-
-  // Intro blocks: paragraphs until first ### section.
-  const introBlocks: string[] = [];
-  let i = 0;
-  for (; i < content.length; i++) {
-    const line = content[i].trim();
-    if (!line) continue;
-    if (line.startsWith("### ")) break;
-    if (line.startsWith("![")) continue;
-
-    // skip UI trash from export
-    if (line.toLowerCase().includes("captcha validation")) continue;
-
-    // treat as paragraph
-    introBlocks.push(normalizeText(line));
-  }
-
-  const headings: Array<{ title: string; index: number }> = [];
-  for (let j = 0; j < content.length; j++) {
-    const m = content[j].trim().match(/^###\s+(.+)/);
-    if (m) headings.push({ title: normalizeText(m[1]), index: j });
-  }
-
-  const sections: SplitBullets[] = [];
-  for (let j = 0; j < headings.length; j++) {
-    const h = headings[j];
-    const next = headings[j + 1];
-    const slice = content.slice(h.index + 1, next ? next.index : content.length);
-
-    if (h.title.toLowerCase().startsWith("we also offer")) continue;
-    if (h.title.toLowerCase().includes("office")) continue;
-
-    const bullets: string[] = [];
-    for (const rawLine of slice) {
-      const line = rawLine.trim();
-      const bm = line.match(/^\*\s+(.+)/);
-      if (bm) bullets.push(normalizeText(bm[1]));
-    }
-
-    if (bullets.length === 0) continue;
-
-    sections.push({
-      id: slugify(h.title),
-      title: h.title,
-      bullets,
-    });
-  }
-
-  // Also offer links
-  const alsoOffer: Array<{ label: string; href: string }> = [];
-  const alsoStart = content.findIndex((l) => l.trim() === "### We Also Offer :");
-  if (alsoStart >= 0) {
-    const alsoSlice = content.slice(alsoStart + 1);
-    for (const rawLine of alsoSlice) {
-      const line = rawLine.trim();
-      const lm = line.match(/^\*\s+\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
-      if (!lm) continue;
-      alsoOffer.push({ label: normalizeText(lm[1]), href: lm[2] });
-    }
-  }
-
-  const offices = parseOfficeContacts(content);
-
-  return {
-    title: "Security Trustee",
-    introBlocks,
-    sections,
-    alsoOffer,
-    offices,
-  };
-}
+const securityTrusteeData = {
+  title: "Security Trustee",
+  introBlocks: [
+    "As a Security Trustee, Beacon Trusteeship acts as a non-partisan fiduciary person, holding in good faith & trust, a security for the benefit of Banks, NBFCs, Financial Institutions & other types of Lenders. A Security Trustee in India acts as a Trustee to a Trust set up through a legally valid, binding & enforceable Security Trustee Agreement (STA) executed between the Security Trustee, Borrower(s) & Lender(s).",
+    "Beacon Trusteeship specializes in providing feasible & meaningful customer-centric solutions to its clients, the Borrowers & Lenders. The domain of these solutions broadly envisages advising Borrower & any Third Party security providers on charge creation, monitoring various intricate terms of facilities extended by the Lender & hosting a hassle-free loan sell-down, assignment of facilities, refinance, top-up etc.",
+    "Borrowers intending to raise funds for Capex Finance, Working Capital, Real Estate Projects, Infrastructure Projects belonging to crucial sectors like Power, Roads, Railways, Airports, Ports, Telecom, Pharmaceuticals, Steel Works etc. tend to raise such funds through a consortium of Lenders, the likes of which are Banks, NBFCs & Financial Institutions.",
+    "Lenders, providing a cluster of facilities covering Term Loan, Working Capital, Cash Credit, Project Finance, Commercial Vehicle Finance, Equipment Finance, Loan against Securities etc. are most often secured by a charge on immovable &/or movable properties of the Borrower or any other Third Party.",
+  ],
+  sections: [
+    {
+      id: "benefits-to-lenders",
+      title: "Benefits to the Lenders",
+      bullets: [
+        "Easy expedition of loan sell-down or divestment to incumbent incoming Lenders with minimal documentation",
+        "Enabling Banks to benefit from Pledge of Shares in Borrower Company & correspondingly comply with restrictions as imposed by The Banking Regulation Act, 1949",
+        "Ensuring compliance with disclosure requirements as under SEBI (Substantial Acquisition of Shares and Takeovers) Regulations, 2011",
+        "Timely updates on Interest Payments, Principal Redemption & Asset Cover maintenance alongside many other crucial terms of the facilities sanctioned",
+        "360 degree outlook on applicable laws & regulations to render a fruitful direction",
+      ],
+    },
+    {
+      id: "benefits-to-borrowers",
+      title: "Benefits to the Borrowers",
+      bullets: [
+        "Single point of contact for communication to & fro with multiple or consortium of Lenders",
+        "Savings on Stamp Duty which would have been incurred for the execution of documents with multiple Lenders in absence of Security Trustee",
+        "Enabling allocation of crucial resources – time, money & manpower, for core business activities",
+        "Start-to-end Assistance in charge registration with ROC, CERSAI & other Information Utilities",
+        "Assistance in complying with terms as set by Lenders for facilities sanctioned",
+      ],
+    },
+    {
+      id: "services-offered",
+      title: "Services Offered",
+      bullets: [
+        "Assistance to Borrower in Security Creation",
+        "Ensuring timely registration of charge with ROC, CERSAI & Information Utility",
+        "Verifying Title & Valuation of Security / Collateral offered",
+        "Retention of Security & continuous monitoring of asset cover",
+        "Follow up for timely interest payments & principal redemption",
+        "Meticulous compliance with terms of sanction & agreements executed",
+        "Prompt response to Lender Grievances",
+        "Proactive security enforcement as per terms of agreement &/or instructions of Lenders while maintaining adherence to applicable laws & regulations",
+        "Effectual communication to & fro with all stakeholders involved",
+      ],
+    },
+    {
+      id: "one-stop-trustee",
+      title: "Being a one-stop Security Trustee to our clients, we also offer",
+      bullets: [
+        "Drafting & Vetting of Transaction Documents",
+        "Set up of Escrow Accounts & cash flows mechanism",
+        "Safe Custody & digitisation of valuable documents, Title Deeds, etc.",
+        "Automated MIS & crucial Milestone Reports as per client's needs",
+        "Enabling Pledge Physical & Demat mode alongside disclosures as per SEBI SAST Regulations",
+        "Periodic monitoring of Cash Flows from Real Estate Projects",
+        "Comfort to execute documents on a pan India basis",
+      ],
+    },
+  ] as SplitBullets[],
+  alsoOffer: [
+    { label: "Family Office / Family Trust", href: "https://beacontrustee.co.in/family-trust" },
+    { label: "Escrow Agent /Source Code Escrow /M&A /Settlement Escrow", href: "https://beacontrustee.co.in/escrow-monitoring-agency" },
+    { label: "Security Trustee", href: "https://beacontrustee.co.in/security-trustee-services" },
+    { label: "Facility Agent", href: "https://beacontrustee.co.in/facility-agent" },
+    { label: "ESOP / EWT / EBT (For Unlisted Shares)", href: "https://beacontrustee.co.in/esop-unregulated" },
+    { label: "Safe Keeping Agent", href: "https://beacontrustee.co.in/safe-keeping-agent" },
+    { label: "Share Pledge Trustee (For Unlisted Shares)", href: "https://beacontrustee.co.in/share-pledge-trustee-unregulated" },
+  ],
+  offices: [
+    {
+      office: "Mumbai Office",
+      people: [
+        { name: "Jaydeep Bhattacharya", role: "Executive Director", phone: "+91 9324724949" },
+        { name: "Veena Nautiyal", role: "Associate Director", phone: "+91 9324724945" },
+        { name: "Deepavali Vankalu", role: "Vice President", phone: "+91 9324724944" },
+      ],
+    },
+    {
+      office: "Delhi Office",
+      people: [
+        { name: "Kamal Paul", role: "Associate Vice President", phone: "+91 7208967004" },
+      ],
+    },
+    {
+      office: "Hyderabad Office",
+      people: [
+        { name: "Paul Samuel", role: "Regional Head - AP & Telangana", phone: "+91 9848805576" },
+      ],
+    },
+    {
+      office: "Bangalore Office",
+      people: [
+        { name: "Deepak Kulkarni", role: "Senior Manager", phone: "+91 9136929255" },
+      ],
+    },
+    {
+      office: "Chennai Office",
+      people: [
+        { name: "Sunil Menon", role: "Senior Manager", phone: "+91 7208967017" },
+      ],
+    },
+  ] as OfficeContacts[],
+};
 
 export default function SecurityTrusteeServicesPage() {
-  const mdPath = path.join(process.cwd(), "content", "security-trustee-services", "index.md");
-  const md = fs.readFileSync(mdPath, "utf8");
-
-  const { title, introBlocks, sections, alsoOffer, offices } = parseSecurityTrustee(md);
+  const { title, introBlocks, sections, alsoOffer, offices } = securityTrusteeData;
 
   const nav = [
     { id: "overview", label: "Overview" },

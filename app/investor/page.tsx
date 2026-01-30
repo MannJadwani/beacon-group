@@ -1,6 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import Image from "next/image";
 
 import { BricknetFooter } from "@/components/layout/BricknetFooter";
@@ -14,165 +11,57 @@ type DocItem = {
   category: string;
 };
 
-function normalizeLabel(input: string) {
-  return input
-    .replaceAll("**", "")
-    .replaceAll("\\_", " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function fileKindFromUrl(url: string) {
-  const clean = url.split("?")[0].split("#")[0];
-  const match = clean.match(/\.([a-z0-9]+)$/i);
-  if (!match) return "LINK";
-  return match[1].toUpperCase();
-}
-
-function parseDownloadPairs(markdown: string): Array<{ label: string; url: string }> {
-  const lines = markdown.split(/\r?\n/);
-
-  const start = lines.findIndex((l) => l.includes("This page is for dissemination"));
-  const end = lines.findIndex((l) => l.trim() === "## Testimonials");
-
-  const slice = lines.slice(start >= 0 ? start : 0, end > 0 ? end : lines.length);
-
-  const docs: Array<{ label: string; url: string }> = [];
-
-  for (let i = 0; i < slice.length; i++) {
-    const line = slice[i].trim();
-    const m = line.match(/^\[Download Now\]\((https?:\/\/[^)]+)\)/i);
-    if (!m) continue;
-
-    const url = m[1];
-
-    let j = i - 1;
-    while (j >= 0 && slice[j].trim() === "") j--;
-    if (j < 0) continue;
-
-    const rawLabel = slice[j].replace(/^#+\s+/, "").trim();
-    const label = normalizeLabel(rawLabel);
-
-    if (!label) continue;
-    if (label.toLowerCase() === "download now") continue;
-
-    docs.push({ label, url });
-  }
-
-  const byUrl = new Map<string, string>();
-  for (const doc of docs) {
-    if (!byUrl.has(doc.url)) byUrl.set(doc.url, doc.label);
-  }
-
-  return [...byUrl.entries()].map(([url, label]) => ({ label, url }));
-}
-
-function inferCategory(doc: { label: string; url: string }): string {
-  const text = `${doc.label} ${doc.url}`.toLowerCase();
-
-  if (
-    text.includes("scheme of arrangement") ||
-    text.includes("amalgamation") ||
-    text.includes("pre-merger") ||
-    text.includes("post-merger") ||
-    text.includes("valuation") ||
-    text.includes("annexure") ||
-    text.includes("audit committee report") ||
-    text.includes("fairness") ||
-    text.includes("pastdefaults") ||
-    text.includes("nocfrom") ||
-    text.includes("without_pan")
-  ) {
-    return "Scheme of Arrangement";
-  }
-
-  if (
-    text.includes("intimations to stock exchanges related to material") ||
-    text.includes("regn 30") ||
-    text.includes("material events") ||
-    text.includes("price movement") ||
-    text.includes("grant_of_cor") ||
-    text.includes("analyst") ||
-    text.includes("sat order") ||
-    text.includes("advisory") ||
-    text.includes("cautionary") ||
-    text.includes("licence")
-  ) {
-    return "Material Event Intimations";
-  }
-
-  if (
-    text.includes("intimations to stock exchanges related to board meeting") ||
-    text.includes("board meeting") ||
-    text.includes("outcome of board meeting") ||
-    text.includes("bm") ||
-    text.includes("trading window")
-  ) {
-    return "Board Meeting Intimations";
-  }
-
-  if (
-    text.includes("intimations to stock exchanges") ||
-    text.includes("reg 74") ||
-    text.includes("reconciliation") ||
-    text.includes("sdd") ||
-    text.includes("certificate") ||
-    text.includes("non-applicability") ||
-    text.includes("secretarial") ||
-    text.includes("statement of deviation")
-  ) {
-    return "Stock Exchange Intimations";
-  }
-
-  if (text.includes("prospectus") || text.includes("herring")) {
-    return "Offer Documents";
-  }
-
-  if (text.includes("materiality")) {
-    return "Materiality Resolution";
-  }
-
-  if (text.includes("group_company_financials") || text.includes("group company financials")) {
-    return "Group Company Financials";
-  }
-
-  if (text.includes("half yearly results") || text.includes("outcome_&_financials")) {
-    return "Half Yearly Results";
-  }
-
-  if (text.includes("annual report") || text.match(/\bfy\s*20\d\d/i)) {
-    return "Annual Reports";
-  }
-
-  if (text.includes("mgt-7") || text.includes("form_mgt_7") || text.includes("annual return")) {
-    return "Annual Return";
-  }
-
-  if (text.includes("agm notice")) {
-    return "AGM Notice";
-  }
-
-  if (text.includes("shp") || text.includes("share holding") || text.includes("shareholding")) {
-    return "Share Holding Pattern";
-  }
-
-  if (text.includes("investor complaints") || text.includes("integrated governance") || text.includes("grievance")) {
-    return "Statement & Investor Complaints";
-  }
-
-  if (text.includes("policy") || text.includes("code of") || text.includes("posh") || text.includes("csr")) {
-    return "Policies";
-  }
-
-  return "Other";
-}
-
 function slugify(input: string) {
   return input
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
 }
+
+const docs: DocItem[] = [
+  { label: "Group Company Financials", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8066_20241127155349_group_company_financials.pdf", kind: "PDF", category: "Group Company Financials" },
+  { label: "Draft Red Herring Prospectus", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3187_20241127171041_draft_red_herring_prospectus_beacon_(1).pdf", kind: "PDF", category: "Offer Documents" },
+  { label: "Red Herring Prospectus", url: "https://beacontrustee.co.in/wp-content/uploads/investor/1921_20241127171147_red_herring_prospectus_(1).pdf", kind: "PDF", category: "Offer Documents" },
+  { label: "Abridged Prospectus", url: "https://beacontrustee.co.in/wp-content/uploads/investor/1827_20241127171235_abridged_prospectus.pdf", kind: "PDF", category: "Offer Documents" },
+  { label: "Prospectus", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4448_20241127171321_prospectus_beacon.pdf", kind: "PDF", category: "Offer Documents" },
+  { label: "Materiality Resolution Litigation", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4411_20241127171401_board_resolution_materiality_litigation.pdf", kind: "PDF", category: "Materiality Resolution" },
+  { label: "Materiality Resolution Group Companies", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3936_20241127171527_board_resolution_materiality_resolution_group_companies_07_02_2024.pdf", kind: "PDF", category: "Materiality Resolution" },
+  { label: "Materiality Resolution Lenders", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3155_20241127171603_board_resolution_materiality_resolution_lenders_07_02_2024.pdf", kind: "PDF", category: "Materiality Resolution" },
+  { label: "FY 2024-25", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4389_20250805105023_btl_annual_report_2024-25_compressed.pdf", kind: "PDF", category: "Annual Reports" },
+  { label: "FY 2023-24", url: "https://beacontrustee.co.in/wp-content/uploads/investor/1460_20241127171844_financials_2023_24.pdf", kind: "PDF", category: "Annual Reports" },
+  { label: "FY 2022-23", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4450_20241127171936_financials_2022_23.pdf", kind: "PDF", category: "Annual Reports" },
+  { label: "FY 2021-22", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8201_20241127172030_financials_2021_22.pdf", kind: "PDF", category: "Annual Reports" },
+  { label: "FY 2020-21", url: "https://beacontrustee.co.in/wp-content/uploads/investor/7336_20241127172115_financials_2020_21.pdf", kind: "PDF", category: "Annual Reports" },
+  { label: "Half Yearly Results 30th September, 2025", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8134_20251113181859_beacon_outcome_of_board_meeting_13112025.pdf", kind: "PDF", category: "Half Yearly Results" },
+  { label: "Half Yearly Results 31st March, 2025.", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6738_20251111152554_beacon_24052025145320_btl_outcome_may_25.pdf", kind: "PDF", category: "Half Yearly Results" },
+  { label: "Half Yearly Results 30th September, 2024.", url: "https://beacontrustee.co.in/wp-content/uploads/investor/9261_20251111153905_btl_outcome_&_financials_sep_24_signed.pdf", kind: "PDF", category: "Half Yearly Results" },
+  { label: "Beacon Annual Return 2024-25 Form_MGT_7", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6895_20260116150750_mgt-7.pdf", kind: "PDF", category: "Annual Return" },
+  { label: "Beacon Annual Return 2023-24 Form_MGT_7", url: "https://beacontrustee.co.in/wp-content/uploads/investor/7413_20250625175332_beacon_annual_return_2023-24_form_mgt_7.pdf", kind: "PDF", category: "Annual Return" },
+  { label: "AGM Notice 2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/2382_20241127172428_agm_notice_2024.pdf", kind: "PDF", category: "AGM Notice" },
+  { label: "As on 30.Sep.2025", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3720_20251020162949_shp_300925_report.html", kind: "HTML", category: "Share Holding Pattern" },
+  { label: "As on 31.Mar.2025", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6605_20250421182202_beacon_shp_report_31.03.25.html", kind: "HTML", category: "Share Holding Pattern" },
+  { label: "As on 30.Sep.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/1250_20250205144131_beacon_revised_shp.html", kind: "HTML", category: "Share Holding Pattern" },
+  { label: "As on 03.Jun.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/7675_20241127175336_17072024182032_ixbrl.html", kind: "HTML", category: "Share Holding Pattern" },
+  { label: "As on 12.Feb.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/5553_20241127175425_list_of_shareholders_12_02_24.pdf", kind: "PDF", category: "Share Holding Pattern" },
+  { label: "Beacon_Integrated Governance Report_30.06.2025", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6057_20250909130607_beacon_integrated_governance_report_30.06.2025.html", kind: "HTML", category: "Statement & Investor Complaints" },
+  { label: "Beacon_Integrated Governance Report_31032025", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8365_20250909130511_beacon_integrated_governance_report_31032025.html", kind: "HTML", category: "Statement & Investor Complaints" },
+  { label: "Investor Complaints 31.12.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/5025_20250122110619_beacon_investor_grievance_xbrl.html", kind: "HTML", category: "Statement & Investor Complaints" },
+  { label: "Investor Complaints 30.09.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3161_20241127175521_investor_complaints_30.09.2024.html", kind: "HTML", category: "Statement & Investor Complaints" },
+  { label: "Investor Complaints 30.06.2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4545_20241127175559_investor_complaints_30.6.2024.html", kind: "HTML", category: "Statement & Investor Complaints" },
+  { label: "AGM Notice intimation 2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4888_20241127175813_agm_notice___intimation_to_stock_exchange_signed.pdf", kind: "PDF", category: "Notices Intimation" },
+  { label: "Annual Report intimation 2024", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4326_20241127175914_annual_report___intimation_to_stock_exchange_signed.pdf", kind: "PDF", category: "Notices Intimation" },
+  { label: "RPT Policy_V2", url: "https://beacontrustee.co.in/wp-content/uploads/investor/9234_20251016171823_rpt_policy_v2.pdf", kind: "PDF", category: "Policies" },
+  { label: "Archival Policy_V2", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6319_20251016171850_archival_policy_v2.pdf", kind: "PDF", category: "Policies" },
+  { label: "Insider Trading Policy_V2", url: "https://beacontrustee.co.in/wp-content/uploads/investor/4235_20251016171735_insider_trading_policy_v2.pdf", kind: "PDF", category: "Policies" },
+  { label: "Code of fair practises upsi policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/1112_20250610181138_code_of_fair_practises_-_upsi_policy.pdf", kind: "PDF", category: "Policies" },
+  { label: "Material Subsidiary", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3185_20251010143422_policy_on_material_subsidiary_29.09.2025.pdf", kind: "PDF", category: "Policies" },
+  { label: "Whistle Blower or Vigil Mechanism Policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8799_20251010144842_whistle_blower_or_vigil_mechanism_policy_v1.pdf", kind: "PDF", category: "Policies" },
+  { label: "Policy on Materility of Events", url: "https://beacontrustee.co.in/wp-content/uploads/investor/9842_20251010144556_policy_on_materility_of_events_v1.pdf", kind: "PDF", category: "Policies" },
+  { label: "POSH policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/6195_20241127180032_posh_policy.pdf", kind: "PDF", category: "Policies" },
+  { label: "CSR policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/3291_20241127180102_csr_policy_beacon.pdf", kind: "PDF", category: "Policies" },
+  { label: "Nomination and Remuneration policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/5992_20241127180137_nomination_and_remuneration_policy.pdf", kind: "PDF", category: "Policies" },
+  { label: "Archival policy", url: "https://beacontrustee.co.in/wp-content/uploads/investor/8129_20241127180203_archival_policy.pdf", kind: "PDF", category: "Policies" },
+];
 
 function groupDocs(docs: DocItem[]) {
   const map = new Map<string, DocItem[]>();
@@ -218,20 +107,6 @@ function DocRow({ index, doc }: { index: number; doc: DocItem }) {
 }
 
 export default function InvestorPage() {
-  const investorMdPath = path.join(process.cwd(), "content", "investor", "index.md");
-  const investorMd = fs.readFileSync(investorMdPath, "utf8");
-
-  const rawDocs = parseDownloadPairs(investorMd);
-  const docs: DocItem[] = rawDocs.map((d) => {
-    const kind = fileKindFromUrl(d.url);
-    return {
-      label: d.label,
-      url: d.url,
-      kind,
-      category: inferCategory(d),
-    };
-  });
-
   const grouped = groupDocs(docs);
 
   const orderedCategories = [
@@ -245,11 +120,7 @@ export default function InvestorPage() {
     "Share Holding Pattern",
     "Statement & Investor Complaints",
     "Policies",
-    "Stock Exchange Intimations",
-    "Material Event Intimations",
-    "Board Meeting Intimations",
-    "Scheme of Arrangement",
-    "Other",
+    "Notices Intimation",
   ].filter((c) => (grouped.get(c)?.length ?? 0) > 0);
 
   const nav = [

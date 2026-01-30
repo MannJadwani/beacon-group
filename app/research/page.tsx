@@ -11,7 +11,24 @@ type ResearchItem = {
   views: number | null;
 };
 
-const data = {
+type ResearchData = {
+  reports: ResearchItem[];
+  updates: ResearchItem[];
+  categories: {
+    reports: string[];
+    updates: string[];
+  };
+  contact: {
+    phone: string;
+    email: string;
+  };
+};
+
+// CMS API URL - in production, this should be an environment variable
+const CMS_API_URL = process.env.CMS_API_URL || "http://localhost:3001/api";
+
+// Fallback data in case CMS is unavailable
+const fallbackData: ResearchData = {
   reports: [
     {
       title: "Report On AIF - Part I",
@@ -25,7 +42,7 @@ const data = {
       imageSrc: "https://beacontrustee.co.in/cms/documents/png/report_on_securitization__20231201153658_5026.jpg",
       views: 189
     }
-  ] as ResearchItem[],
+  ],
   updates: [
     {
       title: "Simplification Of Requirements For Grant Of Accreditati...",
@@ -38,194 +55,8 @@ const data = {
       href: "https://beacontrustee.co.in/cms/documents/png/aifs147852369_20251231124142_8525.jpg",
       imageSrc: "https://beacontrustee.co.in/cms/documents/png/aifs147852369_20251231124142_8525.jpg",
       views: 6
-    },
-    {
-      title: "Modification In The Conditions Specified For Reduction ...",
-      href: "https://beacontrustee.co.in/cms/documents/png/hyuiikjsdfghjk_20251223184359_3693.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/hyuiikjsdfghjk_20251223184359_3693.jpg",
-      views: 6
-    },
-    {
-      title: "SEBI Board Meeting - 17th December 2025",
-      href: "https://beacontrustee.co.in/cms/documents/png/sbm147852369_20251223181808_1617.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sbm147852369_20251223181808_1617.jpg",
-      views: 4
-    },
-    {
-      title: "Mandating Periodic Disclosure Requirements - Securitise...",
-      href: "https://beacontrustee.co.in/cms/documents/png/7896543210147_20251219151642_8308.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/7896543210147_20251219151642_8308.jpg",
-      views: 6
-    },
-    {
-      title: "Relaxation On Geo-tagging Requirement In India For NRIs...",
-      href: "https://beacontrustee.co.in/cms/documents/png/25896314745698_20251212162447_7300.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/25896314745698_20251212162447_7300.jpg",
-      views: 6
-    },
-    {
-      title: "Clarification On The Digital Accessibility Circulars Of...",
-      href: "https://beacontrustee.co.in/cms/documents/png/123456789iuytrewq_20251210175838_1228.png",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/123456789iuytrewq_20251210175838_1228.png",
-      views: 5
-    },
-    {
-      title: "Modalities For Migration To AI Only Schemes And Relaxa...",
-      href: "https://beacontrustee.co.in/cms/documents/png/zxcvbnmlkjhgfdsa_20251209182824_5171.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/zxcvbnmlkjhgfdsa_20251209182824_5171.jpg",
-      views: 4
-    },
-    {
-      title: "Modifications To Chapter IV Of The Master Circular For ...",
-      href: "https://beacontrustee.co.in/cms/documents/png/dt_modification_20251203181242_4265.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt_modification_20251203181242_4265.jpg",
-      views: 6
-    },
-    {
-      title: "Specification Of The Terms And Conditions For Debenture...",
-      href: "https://beacontrustee.co.in/cms/documents/png/dt45_20251202182226_3626.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt45_20251202182226_3626.jpg",
-      views: 2
-    },
-    {
-      title: "Timeline For Submission Of Information By The Issuer To...",
-      href: "https://beacontrustee.co.in/cms/documents/png/dt_20251201182006_3571.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/dt_20251201182006_3571.jpg",
-      views: 3
-    },
-    {
-      title: "Relaxation In Timeline For Disclosure Of Allocation Met...",
-      href: "https://beacontrustee.co.in/cms/documents/png/relaxation_in_timeline_for_disclosure_of_allocation_0987_20251017173914_4093.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/relaxation_in_timeline_for_disclosure_of_allocation_0987_20251017173914_4093.jpg",
-      views: 10
-    },
-    {
-      title: "Compliance Guidelines For Digital Accessibility Circula...",
-      href: "https://beacontrustee.co.in/cms/documents/png/2016879654_20250926174110_7955.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/2016879654_20250926174110_7955.jpg",
-      views: 11
-    },
-    {
-      title: "SEBI Board Meeting - 12th September 2025",
-      href: "https://beacontrustee.co.in/cms/documents/png/bm_12thsept_20250918184148_2164.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/bm_12thsept_20250918184148_2164.jpg",
-      views: 10
-    },
-    {
-      title: "Revised Regulatory Framework For Angel Funds Under AIF ...",
-      href: "https://beacontrustee.co.in/cms/documents/png/7896543210_20250912182917_1651.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/7896543210_20250912182917_1651.jpg",
-      views: 4
-    },
-    {
-      title: "Framework For AIFs To Make Co-investment Within The AIF...",
-      href: "https://beacontrustee.co.in/cms/documents/png/258147369_20250912171317_7872.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/258147369_20250912171317_7872.jpg",
-      views: 6
-    },
-    {
-      title: "Extension Of Timelines And Update Of Reporting Authorit...",
-      href: "https://beacontrustee.co.in/cms/documents/png/0147852369_20250901180426_9468.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/0147852369_20250901180426_9468.jpg",
-      views: 8
-    },
-    {
-      title: "Rights Of Persons With Disabilities Act, 2016 And Rules...",
-      href: "https://beacontrustee.co.in/cms/documents/png/369963_20250811182016_5569.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/369963_20250811182016_5569.jpg",
-      views: 3
-    },
-    {
-      title: "Reserve Bank Of India (Investment In AIF) Directions, 2...",
-      href: "https://beacontrustee.co.in/cms/documents/png/reserve_bank_of_india_(investment_in_aif)_directions,_2025_20250731172739_6896.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/reserve_bank_of_india_(investment_in_aif)_directions,_2025_20250731172739_6896.jpg",
-      views: 9
-    },
-    {
-      title: "Extension Towards Adoption And Implementation Of Cybers...",
-      href: "https://beacontrustee.co.in/cms/documents/png/extension_towards_adoption_and_implementation_of_cybersecurity_and_cyber_resilience_20250701173146_9519.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/extension_towards_adoption_and_implementation_of_cybersecurity_and_cyber_resilience_20250701173146_9519.jpg",
-      views: 11
-    },
-    {
-      title: "SEBI Board Meeting - 18th June 2025",
-      href: "https://beacontrustee.co.in/cms/documents/png/sbm_-_18th_june_2025_20250624163529_5794.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sbm_-_18th_june_2025_20250624163529_5794.jpg",
-      views: 13
-    },
-    {
-      title: "Extension Of Timeline Of Additional Liquidation Period ...",
-      href: "https://beacontrustee.co.in/cms/documents/png/aif_circular_20250609180644_6096.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/aif_circular_20250609180644_6096.jpg",
-      views: 9
-    },
-    {
-      title: "Review Of Provisions Pertaining To Electronic Book Prov...",
-      href: "https://beacontrustee.co.in/cms/documents/png/ksyom_20250522175859_9226.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/ksyom_20250522175859_9226.jpg",
-      views: 10
-    },
-    {
-      title: "Rating Of Municipal Bonds On The Expected Loss (EL) Bas...",
-      href: "https://beacontrustee.co.in/cms/documents/png/municipal_jpeg_20250519181031_2069.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/municipal_jpeg_20250519181031_2069.jpg",
-      views: 11
-    },
-    {
-      title: "Extension Of Timeline For Complying With The Certificat...",
-      href: "https://beacontrustee.co.in/cms/documents/png/aif_new_circular_20250514174342_9366.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/aif_new_circular_20250514174342_9366.jpg",
-      views: 7
-    },
-    {
-      title: "SECURITIES AND EXCHANGE BOARD OF INDIA (LISTING OBLIGAT...",
-      href: "https://beacontrustee.co.in/cms/documents/png/sebi_lodr_img_20250404182723_3305.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_lodr_img_20250404182723_3305.jpg",
-      views: 18
-    },
-    {
-      title: "Extension Towards Adoption And Implementation Of Cybers...",
-      href: "https://beacontrustee.co.in/cms/documents/png/cscrf_&_res_20250331180442_2207.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/cscrf_&_res_20250331180442_2207.jpg",
-      views: 10
-    },
-    {
-      title: "SEBI Board Meeting - 24th March 2025",
-      href: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_24th_march_2025_20250328174022_7147.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_24th_march_2025_20250328174022_7147.jpg",
-      views: 15
-    },
-    {
-      title: "Relaxation In Timeline For Reporting Of Differential Ri...",
-      href: "https://beacontrustee.co.in/cms/documents/png/67890_20250304181333_5748.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/67890_20250304181333_5748.jpg",
-      views: 13
-    },
-    {
-      title: "Relaxation In Timelines For Holding AIFs' Investments...",
-      href: "https://beacontrustee.co.in/cms/documents/png/circular_14th_feb_20250218162205_6834.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/circular_14th_feb_20250218162205_6834.jpg",
-      views: 13
-    },
-    {
-      title: "Private Placement Of Non-Convertible Debentures (NCDs) ...",
-      href: "https://beacontrustee.co.in/cms/documents/png/nbfc_hfc_circular_20250204154845_6514.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/nbfc_hfc_circular_20250204154845_6514.jpg",
-      views: 12
-    },
-    {
-      title: "Measures For Ease Of Doing Business For Credit Rating A...",
-      href: "https://beacontrustee.co.in/cms/documents/png/measures_for_ease_of_doing_business_for_credit_rating_agencies_(cras)_timelines_jpeg_20250110171710_8964.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/measures_for_ease_of_doing_business_for_credit_rating_agencies_(cras)_timelines_jpeg_20250110171710_8964.jpg",
-      views: 22
-    },
-    {
-      title: "SEBI Board Meeting - 18th December 2024",
-      href: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_18th_december_2024_20241219172635_8911.jpg",
-      imageSrc: "https://beacontrustee.co.in/cms/documents/png/sebi_board_meeting_-_18th_december_2024_20241219172635_8911.jpg",
-      views: null
     }
-  ] as ResearchItem[],
+  ],
   categories: {
     reports: ["AIF", "Securitization"],
     updates: ["AIF", "Debenture Trustee", "Investor Grievances", "Board Meetings", "Others"]
@@ -236,7 +67,31 @@ const data = {
   }
 };
 
-export default function ResearchPage() {
+// Fetch research data from CMS
+async function getResearchData(): Promise<ResearchData> {
+  try {
+    // In production, fetch from CMS API
+    const res = await fetch(`${CMS_API_URL}/research`, {
+      // Add cache revalidation as needed
+      next: { revalidate: 60 } // Revalidate every 60 seconds
+    });
+
+    if (!res.ok) {
+      throw new Error(`CMS API error: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch from CMS, using fallback data:", error);
+    // Return fallback data if CMS is unavailable
+    return fallbackData;
+  }
+}
+
+export default async function ResearchPage() {
+  // Fetch data from CMS
+  const data = await getResearchData();
   const { reports, updates, categories, contact } = data;
 
   return (
@@ -305,7 +160,7 @@ export default function ResearchPage() {
                   </p>
                   <p className="mt-4 text-2xl font-medium leading-tight text-primary-navy">Contact + coverage</p>
                   <p className="mt-3 text-sm leading-relaxed text-primary-navy/60">
-                    This page is generated from the source export and lists the latest items captured.
+                    Managed via CMS — content is dynamically fetched from the research database.
                   </p>
 
                   <div className="mt-8 grid grid-cols-1 gap-4">
@@ -326,7 +181,7 @@ export default function ResearchPage() {
                         Phone
                       </p>
                       <a
-                        href="tel:+918451844276"
+                        href={`tel:${contact.phone.replace(/\s+/g, "")}`}
                         className="mt-3 block text-base font-semibold text-primary-navy hover:text-accent-gold"
                       >
                         {contact.phone}
@@ -369,7 +224,7 @@ export default function ResearchPage() {
               Long-form analysis
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-primary-navy/60">
-              Reports captured in the export. Open an item to view the source asset.
+              Reports from the CMS. Open an item to view the source asset.
             </p>
           </div>
 
@@ -437,7 +292,7 @@ export default function ResearchPage() {
               A running log
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-primary-navy/60">
-              Quick updates and circular snapshots. Titles are preserved exactly as in the export.
+              Quick updates and circular snapshots from the CMS.
             </p>
           </div>
 
